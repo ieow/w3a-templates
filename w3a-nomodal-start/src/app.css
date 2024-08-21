@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background-rgb: 214, 219, 220;
+  --foreground-rgb: 0, 0, 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-rgb: 0, 0, 0;
+    --foreground-rgb: 255, 255, 255;
+  }
+}
+
+body {
+  background: rgb(var(--background-rgb));
+  color: rgb(var(--foreground-rgb));
+}
+
+
+.card {
+  @apply m-2 p-3 text-center bg-[#fafafa] decoration-transparent border border-[#0070f3] text-[#0070f3] rounded-lg transition duration-150 ease-linear w-full active:focus:hover:cursor-pointer active:focus:hover:bg-[#f1f1f1]
+}

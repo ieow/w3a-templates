@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.card {
+  @apply m-2 p-3 text-center bg-[#fafafa] decoration-transparent border border-[#0070f3] text-[#0070f3] rounded-lg transition duration-150 ease-linear w-full active:focus:hover:cursor-pointer active:focus:hover:bg-[#f1f1f1]
+}
