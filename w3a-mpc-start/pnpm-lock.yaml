@@ -39,7 +39,7 @@ importers:
         specifier: ^8.4.38
         version: 8.4.41
       solid-js:
-        specifier: ^1.8.21
+        specifier: ^1.8.18
         version: 1.8.21
       tailwindcss:
         specifier: ^3.4.3

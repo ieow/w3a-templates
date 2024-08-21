@@ -19,7 +19,7 @@
     "@web3auth/mpc-core-kit": "^3.1.0",
     "bn.js": "^5.2.1",
     "firebase": "^10.4.0",
-    "solid-js": "^1.8.21",
+    "solid-js": "^1.8.18",
     "tweetnacl": "^1.0.3",
     "vite-plugin-node-polyfills": "0.17.0"
   },

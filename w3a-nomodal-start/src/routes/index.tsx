@@ -1,4 +1,4 @@
-import { ClientOnly } from "~/components/ClientOnly";
+import { ClientOnly } from "./components/ClientOnly";
 import { W3Auth } from "./Web3Auth";
 
 export default function Home() {
