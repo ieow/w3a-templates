@@ -59,7 +59,7 @@ const Home: Component = () => {
             verifier: "w3a-a0-google",
             clientId: "qnXZflP6MQ8wIj5kjrEqetTSHcC3Phj6",
             jwtParams: {
-              connection: "google",
+              connection: "google-oauth2",
               domain: auth0domainUrl,
               verifierIdField: "email",
             },
@@ -489,9 +489,6 @@ const Home: Component = () => {
       </button>
       <button onClick={loginWithAuth0Google} class="card">
         Login with google
-      </button>
-      <button onClick={loginWithAuth0Twitter} class="card">
-        Login with twitter
       </button>
       <button onClick={loginWithAuth0Twitter} class="card">
         Login with twitter
