@@ -11,7 +11,6 @@ import {
 import { createSignal, onMount } from "solid-js";
 import { BN } from "bn.js";
 import { Component } from "solid-js";
-
 import { tssLib } from "@toruslabs/tss-frost-lib";
 
 import { SolanaRPC } from "./rpc";

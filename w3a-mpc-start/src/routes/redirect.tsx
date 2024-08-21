@@ -3,9 +3,9 @@ import {
   WEB3AUTH_NETWORK,
   Web3AuthMPCCoreKit,
 } from "@web3auth/mpc-core-kit";
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, on, onMount } from "solid-js";
 import { tssLib } from "@toruslabs/tss-frost-lib";
-import { A } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
@@ -22,6 +22,7 @@ const coreKitInstance = new Web3AuthMPCCoreKit({
 });
 
 export default function Redirect() {
+  const navigate = useNavigate();
   const [coreKitStatus, setCoreKitStatus] = createSignal<COREKIT_STATUS>(
     COREKIT_STATUS.NOT_INITIALIZED,
   );
@@ -33,7 +34,8 @@ export default function Redirect() {
   onMount(async () => {
     // Example config to handle redirect result manually
     await coreKitInstance.init({ handleRedirectResult: false, rehydrate });
-    if (window.location.hash.includes("#state")) {
+    if (window.location.hash.includes("#token_type")) {
+      console.log("handling redirect result!");
       await coreKitInstance.handleRedirectResult();
     }
 
@@ -60,9 +62,15 @@ export default function Redirect() {
     // }
   });
 
-  createEffect(() => {
-    console.log({ corekitstatus: coreKitStatus() });
-  });
+  createEffect(
+    on(coreKitStatus, (status) => {
+      console.log({ corekitstatus: status });
+      if (status === COREKIT_STATUS.LOGGED_IN) {
+        console.log("logged in, navigating home!");
+        navigate("/");
+      }
+    }),
+  );
 
   function uiConsole(...args: any[]): void {
     const el = document.querySelector("#console>p");
