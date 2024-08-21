@@ -29,7 +29,7 @@ const coreKitInstance = new Web3AuthMPCCoreKit({
   tssLib,
 });
 
-const App: Component = () => {
+const Home: Component = () => {
   const [coreKitStatus, setCoreKitStatus] = createSignal<COREKIT_STATUS>(
     COREKIT_STATUS.NOT_INITIALIZED,
   );
@@ -561,4 +561,4 @@ const App: Component = () => {
   );
 };
 
-export default App;
+export default Home;
