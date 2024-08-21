@@ -34,7 +34,10 @@ export default function Redirect() {
   onMount(async () => {
     // Example config to handle redirect result manually
     await coreKitInstance.init({ handleRedirectResult: false, rehydrate });
-    if (window.location.hash.includes("#token_type")) {
+    if (
+      window.location.hash.includes("#token_type") ||
+      window.location.hash.includes("#access_token")
+    ) {
       console.log("handling redirect result!");
       await coreKitInstance.handleRedirectResult();
     }
