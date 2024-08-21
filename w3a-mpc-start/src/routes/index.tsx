@@ -19,6 +19,7 @@ const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
+const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 
 const coreKitInstance = new Web3AuthMPCCoreKit({
   web3AuthClientId,
@@ -57,7 +58,7 @@ const Home: Component = () => {
           {
             typeOfLogin: "jwt", // auth0 uses jwt logins
             verifier: "w3a-a0-google",
-            clientId: "qnXZflP6MQ8wIj5kjrEqetTSHcC3Phj6",
+            clientId: auth0ClientId,
             jwtParams: {
               connection: "google-oauth2",
               domain: auth0domainUrl,
@@ -100,7 +101,7 @@ const Home: Component = () => {
           {
             typeOfLogin: "jwt",
             verifier: "w3a-a0-twitter",
-            clientId: "qnXZflP6MQ8wIj5kjrEqetTSHcC3Phj6",
+            clientId: auth0ClientId,
             jwtParams: {
               connection: "twitter",
               domain: auth0domainUrl,
@@ -143,7 +144,7 @@ const Home: Component = () => {
           {
             typeOfLogin: "jwt",
             verifier: "w3a-a0-email-passwordless",
-            clientId: "qnXZflP6MQ8wIj5kjrEqetTSHcC3Phj6",
+            clientId: auth0ClientId,
             jwtParams: {
               connection: "passwordless",
               domain: auth0domainUrl,
