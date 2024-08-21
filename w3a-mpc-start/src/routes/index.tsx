@@ -148,7 +148,7 @@ const Home: Component = () => {
             verifier: "w3a-a0-email-passwordless",
             clientId: auth0ClientId,
             jwtParams: {
-              connection: "passwordless",
+              connection: "email",
               domain: auth0domainUrl,
               verifierIdField: "email",
             },
