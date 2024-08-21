@@ -3,6 +3,20 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
   ssr: false,
+  server: {
+    preset: "cloudflare-pages",
+    alias: {
+      // For `readable-stream` to properly resolve Cloudflare runtime polyfill
+      "process/": "process",
+      "buffer/": "buffer",
+    },
+    esbuild: {
+      options: {
+        // We need BigInt support (default: 2019)
+        target: "esnext",
+      },
+    },
+  },
   vite: {
     define: {
       // For WalletConnect
