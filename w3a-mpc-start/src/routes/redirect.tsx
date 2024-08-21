@@ -17,7 +17,7 @@ const coreKitInstance = new Web3AuthMPCCoreKit({
   manualSync: true,
   tssLib,
   uxMode: "redirect",
-  baseUrl: import.meta.env.BASE_URL,
+  baseUrl: "https://w3a-templates.pages.dev",
   redirectPathName: "redirect",
 });
 
