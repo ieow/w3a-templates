@@ -21,6 +21,8 @@ const web3AuthClientId =
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 
+const aggregateVerifierIdentifier = "w3a-universal-verifier";
+
 const coreKitInstance = new Web3AuthMPCCoreKit({
   web3AuthClientId,
   web3AuthNetwork: WEB3AUTH_NETWORK.DEVNET,
@@ -53,7 +55,7 @@ const Home: Component = () => {
 
       // IMP START - Login
       const verifierConfig = {
-        aggregateVerifierIdentifier: "aggregate-sapphire",
+        aggregateVerifierIdentifier,
         subVerifierDetailsArray: [
           {
             typeOfLogin: "jwt", // auth0 uses jwt logins
@@ -96,7 +98,7 @@ const Home: Component = () => {
 
       // IMP START - Login
       const verifierConfig = {
-        aggregateVerifierIdentifier: "aggregate-sapphire",
+        aggregateVerifierIdentifier,
         subVerifierDetailsArray: [
           {
             typeOfLogin: "jwt",
@@ -139,7 +141,7 @@ const Home: Component = () => {
 
       // IMP START - Login
       const verifierConfig = {
-        aggregateVerifierIdentifier: "aggregate-sapphire",
+        aggregateVerifierIdentifier,
         subVerifierDetailsArray: [
           {
             typeOfLogin: "jwt",
@@ -181,7 +183,7 @@ const Home: Component = () => {
       }
 
       const verifierConfig = {
-        aggregateVerifierIdentifier: "w3a-universal-verifier",
+        aggregateVerifierIdentifier,
         subVerifierDetailsArray: [
           {
             typeOfLogin: "discord",
