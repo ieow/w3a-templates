@@ -11,9 +11,10 @@ import {
 import { createSignal, onMount } from "solid-js";
 import { BN } from "bn.js";
 import { Component } from "solid-js";
+
 import { tssLib } from "@toruslabs/tss-frost-lib";
 
-import { SolanaRPC } from "./rpc.js";
+import { SolanaRPC } from "./rpc";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io

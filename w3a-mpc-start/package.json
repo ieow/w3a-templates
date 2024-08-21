@@ -4,26 +4,30 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start"
+    "start": "vinxi start",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json"
   },
   "dependencies": {
-    "@solidjs/router": "^0.14.1",
-    "@solidjs/start": "^1.0.6",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.3",
-    "vinxi": "^0.4.1",
     "@scure/base": "^1.1.6",
     "@solana/web3.js": "^1.95.2",
+    "@solidjs/router": "^0.14.1",
+    "@solidjs/start": "^1.0.6",
     "@toruslabs/tss-frost-lib": "^0.2.0",
     "@web3auth/mpc-core-kit": "^3.1.0",
+    "autoprefixer": "^10.4.19",
     "bn.js": "^5.2.1",
     "firebase": "^10.4.0",
+    "postcss": "^8.4.38",
     "solid-js": "^1.8.18",
+    "tailwindcss": "^3.4.3",
     "tweetnacl": "^1.0.3",
+    "vinxi": "^0.4.1",
     "vite-plugin-node-polyfills": "0.17.0"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5"
   }
 }

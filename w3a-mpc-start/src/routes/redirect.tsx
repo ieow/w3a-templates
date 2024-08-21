@@ -5,6 +5,7 @@ import {
 } from "@web3auth/mpc-core-kit";
 import { createEffect, createSignal, onMount } from "solid-js";
 import { tssLib } from "@toruslabs/tss-frost-lib";
+import { A } from "@solidjs/router";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
@@ -75,7 +76,6 @@ export default function Redirect() {
       <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">
         About Page
       </h1>
-      <Counter />
       <p class="mt-8">
         Visit{" "}
         <a
