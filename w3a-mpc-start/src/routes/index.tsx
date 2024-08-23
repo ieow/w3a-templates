@@ -38,8 +38,6 @@ const Home: Component = () => {
   const [coreKitStatus, setCoreKitStatus] = createSignal<COREKIT_STATUS>(
     COREKIT_STATUS.NOT_INITIALIZED,
   );
-  const [backupFactorKey, setBackupFactorKey] = createSignal<string>("");
-  const [mnemonicFactor, setMnemonicFactor] = createSignal<string>("");
 
   onMount(async () => {
     console.log("initialigin core kit instance!!");
@@ -212,26 +210,6 @@ const Home: Component = () => {
     }
   };
 
-  const inputBackupFactorKey = async () => {
-    if (!coreKitInstance) {
-      throw new Error("coreKitInstance not found");
-    }
-    const backup = backupFactorKey();
-    if (!backup) {
-      throw new Error("backupFactorKey not found");
-    }
-    const factorKey = new BN(backup, "hex");
-    await coreKitInstance.inputFactorKey(factorKey);
-
-    setCoreKitStatus(coreKitInstance.status);
-
-    if (coreKitInstance.status === COREKIT_STATUS.REQUIRED_SHARE) {
-      uiConsole(
-        "Required more shares even after inputing backup factor key, please enter your backup/ device factor key, or reset account [unrecoverable once reset, please use it with caution]",
-      );
-    }
-  };
-
   const enableMFA = async () => {
     if (!coreKitInstance) {
       throw new Error("CoreKitInstance is not set");
@@ -260,16 +238,6 @@ const Home: Component = () => {
     uiConsole(coreKitInstance.getKeyDetails());
   };
 
-  const getDeviceFactor = async () => {
-    try {
-      const factorKey = await coreKitInstance.getDeviceFactor();
-      setBackupFactorKey(factorKey!);
-      uiConsole("Device share: ", factorKey);
-    } catch (e) {
-      uiConsole(e);
-    }
-  };
-
   const exportMnemonicFactor = async (): Promise<void> => {
     if (!coreKitInstance) {
       throw new Error("coreKitInstance is not set");
@@ -285,19 +253,6 @@ const Home: Component = () => {
       await coreKitInstance.commitChanges();
     }
     uiConsole("Export factor key mnemonic: ", factorKeyMnemonic);
-  };
-
-  const MnemonicToFactorKeyHex = async (mnemonic: string) => {
-    if (!coreKitInstance) {
-      throw new Error("coreKitInstance is not set");
-    }
-    try {
-      const factorKey = mnemonicToKey(mnemonic);
-      setBackupFactorKey(factorKey);
-      return factorKey;
-    } catch (error) {
-      uiConsole(error);
-    }
   };
 
   const getUserInfo = async () => {
@@ -433,7 +388,7 @@ const Home: Component = () => {
         </div>
         <div>
           <button onClick={() => processRequest(enableMFA)} class="card">
-            Enable MFA
+            Enabla MFA
           </button>
         </div>
         <div>
@@ -499,33 +454,6 @@ const Home: Component = () => {
       <button onClick={loginWithAuth0EmailPasswordless} class="card">
         Login with Passwordless
       </button>
-      <div
-        class={
-          coreKitStatus() === COREKIT_STATUS.REQUIRED_SHARE ? "" : "disabledDiv"
-        }
-      >
-        <button onClick={() => getDeviceFactor()} class="card">
-          Get Device Factor
-        </button>
-        <label>Recover Using Mnemonic Factor Key:</label>
-        <input
-          value={mnemonicFactor()}
-          onChange={(e) => setMnemonicFactor(e.target.value)}
-        ></input>
-        <button
-          onClick={() => MnemonicToFactorKeyHex(mnemonicFactor())}
-          class="card"
-        >
-          Get Recovery Factor Key using Mnemonic
-        </button>
-        <label>Backup/ Device Factor: {backupFactorKey()}</label>
-        <button onClick={() => inputBackupFactorKey()} class="card">
-          Input Backup Factor Key
-        </button>
-        <button onClick={criticalResetAccount} class="card">
-          [CRITICAL] Reset Account
-        </button>
-      </div>
     </>
   );
 
