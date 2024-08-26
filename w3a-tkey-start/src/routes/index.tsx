@@ -14,7 +14,7 @@ const securityQuestionsModule = new SecurityQuestionsModule();
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
-const redirect_uri = "https://w3a-templates.pages.dev/redirect";
+const redirect_uri = "https://w3a-tkey-start.pages.dev/redirect";
 const serviceProvider = new TorusServiceProvider({
   enableLogging: true,
   customAuthArgs: {
