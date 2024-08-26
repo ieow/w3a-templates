@@ -107,7 +107,9 @@ const Home: Component = () => {
         console.log({ result });
 
         if ("error" in result) {
-          console.log("privKey missing!");
+          console.log("error found from initial getRedirectResult: ", {
+            error: result.error,
+          });
 
           const loginDetails = await (
             tKey.serviceProvider as TorusServiceProvider
@@ -116,56 +118,42 @@ const Home: Component = () => {
           );
           console.log({ loginDetails });
 
-          if (loginDetails) {
-            return;
-          }
+          // if (loginDetails) {
+          //   return;
+          // }
 
-          (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
-          console.log("cleared orphaned login details!");
+          // (
+          //   tKey.serviceProvider as TorusServiceProvider
+          // ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
+          // console.log("cleared orphaned login details!");
+          //
+          // (
+          //   tKey.serviceProvider as TorusServiceProvider
+          // ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
+          //   result.hashParameters?.scope ?? "local_scope",
+          // );
 
-          (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
-            result.hashParameters?.scope ?? "local_scope",
-          );
+          // console.log("cleared login details of scope!");
+          // if (!("hashParameters" in result) || !result.hashParameters) {
+          //   console.log("no hashParameters in result, cannot revoke token!");
+          //   return;
+          // }
+          //
+          // if (!("access_token" in result.hashParameters)) {
+          //   console.log(
+          //     "no access token in hash parameters, cannot revoke token!",
+          //   );
+          //   return;
+          // }
 
-          console.log("cleared login details of scope!");
-          if (!("hashParameters" in result) || !result.hashParameters) {
-            console.log("no hashParameters in result, cannot revoke token!");
-            return;
-          }
+          // const revokeRes = await revokeDiscordToken(
+          //   result.hashParameters.access_token,
+          // ).then((r) => r.json());
+          // console.log("revoke res: ", { revokeRes });
 
-          if (!("access_token" in result.hashParameters)) {
-            console.log(
-              "no access token in hash parameters, cannot revoke token!",
-            );
-            return;
-          }
-
-          const revokeRes = await revokeDiscordToken(
-            result.hashParameters.access_token,
-          ).then((r) => r.json());
-          console.log("revoke res: ", { revokeRes });
-
-          (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
-          (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
-            result.hashParameters?.scope ?? "local_scope",
-          );
-
-          await (tKey.serviceProvider as TorusServiceProvider).init({
-            skipSw: true,
-            skipPrefetch: true,
-          });
-
-          (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.init();
+          // result = await (
+          //   tKey.serviceProvider as TorusServiceProvider
+          // ).customAuthInstance.storageHelper.storeLoginDetails
 
           result = await (
             tKey.serviceProvider as TorusServiceProvider
