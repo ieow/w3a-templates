@@ -97,7 +97,7 @@ const Home: Component = () => {
         console.log({ result });
         const res = result.result as TorusAggregateLoginResponse;
 
-        if (!("postboxKeyData" in res)) {
+        if ("error" in res) {
           console.log("privKey missing!");
 
           const loginDetails = await (
@@ -105,8 +105,16 @@ const Home: Component = () => {
           ).customAuthInstance.storageHelper.retrieveLoginDetails(
             result.hashParameters?.scope ?? "local_scope",
           );
-
           console.log({ loginDetails });
+
+          if (loginDetails) {
+            return;
+          }
+
+          (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
+          console.log("cleared orphaned login details!");
           return;
         }
 
