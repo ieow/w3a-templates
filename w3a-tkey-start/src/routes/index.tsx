@@ -115,6 +115,13 @@ const Home: Component = () => {
             tKey.serviceProvider as TorusServiceProvider
           ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
           console.log("cleared orphaned login details!");
+
+          (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
+            result.hashParameters?.scope ?? "local_scope",
+          );
+          console.log("cleared login details of scope!");
           return;
         }
 
