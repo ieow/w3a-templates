@@ -99,6 +99,7 @@ export const W3Auth: VoidComponent = () => {
               verifierSubIdentifier: "w3a-a0-google",
               jwtParameters: {
                 domain: "https://dev-n82s5hbtzoxieejz.us.auth0.com",
+                verifierIdField: "email",
               },
             },
             discord: {
