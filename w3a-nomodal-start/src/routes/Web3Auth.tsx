@@ -159,6 +159,14 @@ export const W3Auth: VoidComponent = () => {
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "google",
+      extraLoginOptions: {
+        domain: auth0domainUrl,
+        // this corresponds to the field inside jwt which must be used to uniquely
+        // identify the user. This is mapped b/w google and github logins
+        verifierIdField: "email",
+        isVerifierIdCaseSensitive: false,
+        connection: "google-oauth2",
+      },
     });
     console.log({ web3authProvider });
     setProvider(web3authProvider ?? undefined);
