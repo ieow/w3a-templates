@@ -99,12 +99,6 @@ export const W3Auth: VoidComponent = () => {
               clientId: googleClientId,
               verifier: aggregateVerifierIdentifier,
               verifierSubIdentifier: "w3a-a0-google",
-              jwtParameters: {
-                // redirect_uri: redirectUrl,
-                connection: "google-oauth2",
-                domain: auth0domainUrl,
-                verifierIdField: "email",
-              },
             },
             discord: {
               name: "Discord",
@@ -160,17 +154,14 @@ export const W3Auth: VoidComponent = () => {
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "google",
-      // extraLoginOptions: {
-      //   redirect_uri: redirectUrl,
-      // },
-      // extraLoginOptions: {
-      //   domain: auth0domainUrl,
-      //   // this corresponds to the field inside jwt which must be used to uniquely
-      //   // identify the user. This is mapped b/w google and github logins
-      //   verifierIdField: "email",
-      //   isVerifierIdCaseSensitive: false,
-      //   connection: "google-oauth2",
-      // },
+      extraLoginOptions: {
+        domain: auth0domainUrl,
+        // this corresponds to the field inside jwt which must be used to uniquely
+        // identify the user. This is mapped b/w google and github logins
+        verifierIdField: "email",
+        isVerifierIdCaseSensitive: false,
+        connection: "google-oauth2",
+      },
     });
     console.log({ web3authProvider });
     setProvider(web3authProvider ?? undefined);
