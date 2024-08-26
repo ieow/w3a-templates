@@ -107,6 +107,7 @@ export const W3Auth: VoidComponent = () => {
       await web3auth.init();
       setProvider(web3auth.provider ?? undefined);
       console.log("connected: ", { connected: web3auth.connected });
+      await authenticateUser();
       if (web3auth.connected) {
         setLoggedIn(true);
       }
@@ -144,6 +145,7 @@ export const W3Auth: VoidComponent = () => {
       return;
     }
     const idToken = await auth.authenticateUser();
+    console.log({ idToken });
     uiConsole(idToken);
   };
 
@@ -415,6 +417,10 @@ export const W3Auth: VoidComponent = () => {
             */}
           </>
         </Show>
+      </div>
+
+      <div id="console" style={{ "white-space": "pre-line" }}>
+        <p style={{ "white-space": "pre-line" }}>Status</p>
       </div>
 
       <footer class="flex flex-auto py-8 border border-[#eaeaea] justify-center items-center mt-40">
