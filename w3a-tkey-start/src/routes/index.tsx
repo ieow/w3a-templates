@@ -28,21 +28,6 @@ const storageLayer = new TorusStorageLayer({
   hostUrl: "https://metadata.tor.us",
 });
 
-const privateKeyProvider = new SolanaPrivateKeyProvider({
-  config: {
-    chainConfig: {
-      chainNamespace: "solana",
-      chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-      rpcTarget: "https://api.devnet.solana.com",
-      displayName: "Solana Devnet",
-      blockExplorerUrl: "https://explorer.solana.com",
-      ticker: "SOL",
-      tickerName: "Solana Token",
-      logo: "",
-    },
-  },
-});
-
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
@@ -140,9 +125,6 @@ const Home: Component = () => {
         } else {
           await reconstructKey();
         }
-
-        setProvider(privateKeyProvider);
-        // setProvider(tKey.serviceProvider);
       }
     } catch (error) {
       console.error(error);
@@ -167,10 +149,24 @@ const Home: Component = () => {
       }
       const privateKey = privKey.toString("hex");
 
+      const privateKeyProvider = new SolanaPrivateKeyProvider({
+        config: {
+          chainConfig: {
+            chainNamespace: "solana",
+            chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+            rpcTarget: "https://api.devnet.solana.com",
+            displayName: "Solana Devnet",
+            blockExplorerUrl: "https://explorer.solana.com",
+            ticker: "SOL",
+            tickerName: "Solana Token",
+            logo: "",
+          },
+        },
+      });
+
       await privateKeyProvider.setupProvider(privateKey);
-      // setProvider(privateKeyProvider);
-      // await ethereumPrivateKeyProvider.setupProvider(privateKey);
-      // setProvider(ethereumPrivateKeyProvider);
+      console.log({ privateKeyProvider });
+      setProvider(privateKeyProvider);
       // setLoggedIn(true);
       // setDeviceShare();
     } catch (e) {
