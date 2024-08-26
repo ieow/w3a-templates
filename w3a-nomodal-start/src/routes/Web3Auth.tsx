@@ -6,6 +6,7 @@ import {
   WALLET_ADAPTERS,
   IWeb3Auth,
   IProvider,
+  ADAPTER_EVENTS,
 } from "@web3auth/base";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
@@ -111,10 +112,23 @@ export const W3Auth: VoidComponent = () => {
       setWeb3auth(web3auth);
       web3auth.configureAdapter(openloginAdapter);
 
-      await web3auth.init();
       setProvider(web3auth.provider ?? undefined);
+      web3auth.on(ADAPTER_EVENTS.CONNECTED, () => {
+        console.log("### web3auth connected");
+      });
+      web3auth.on(ADAPTER_EVENTS.DISCONNECTED, () => {
+        console.log("### web3auth disconnected");
+      });
+      web3auth.on(ADAPTER_EVENTS.CONNECTING, () => {
+        console.log("### web3auth connecting");
+      });
+      web3auth.on(ADAPTER_EVENTS.ERRORED, (error) => {
+        console.error("### web3auth error", error);
+      });
+      await web3auth.init();
+
       console.log("connected: ", { connected: web3auth.connected });
-      await authenticateUser();
+      // await authenticateUser();
       if (web3auth.connected) {
         setLoggedIn(true);
       }
