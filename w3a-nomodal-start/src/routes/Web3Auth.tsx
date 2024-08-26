@@ -34,7 +34,10 @@ const redirectUrl = "https://w3a-nomodal-start.pages.dev";
 export const W3Auth: VoidComponent = () => {
   const [web3auth, setWeb3auth] = createSignal<IWeb3Auth | undefined>();
   const [provider, setProvider] = createSignal<IProvider | undefined>();
-  const [loggedIn, setLoggedIn] = createSignal<boolean>(false);
+  const loggedIn = createMemo(() => {
+    const web3 = web3auth();
+    return web3?.connected ?? false;
+  });
 
   const status = createMemo(() => {
     const web3 = web3auth();
@@ -43,6 +46,10 @@ export const W3Auth: VoidComponent = () => {
 
   createEffect(() => {
     console.log({ status: status() });
+  });
+
+  createEffect(() => {
+    console.log({ loggedIn: loggedIn() });
   });
 
   const rpc = createMemo(() => {
@@ -128,10 +135,6 @@ export const W3Auth: VoidComponent = () => {
       await web3auth.init();
 
       console.log("connected: ", { connected: web3auth.connected });
-      // await authenticateUser();
-      if (web3auth.connected) {
-        setLoggedIn(true);
-      }
     } catch (error) {
       console.error(error);
     }
