@@ -99,7 +99,8 @@ const Home: Component = () => {
           const loginDetails = await (
             tKey.serviceProvider as TorusServiceProvider
           ).customAuthInstance.storageHelper.retrieveLoginDetails(
-            result.hashParameters?.scope ?? "local_scope",
+            "",
+            // result.hashParameters?.scope ?? "local_scope",
           );
 
           console.log({ loginDetails });
