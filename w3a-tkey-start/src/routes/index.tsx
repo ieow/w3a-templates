@@ -8,15 +8,16 @@ import { TorusServiceProvider } from "@tkey/service-provider-torus";
 import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
 import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
 import { BN } from "bn.js";
+import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
 const securityQuestionsModule = new SecurityQuestionsModule();
-// const storageLayer = new TorusStorageLayer({
-//   hostUrl: "https://metadata.tor.us",
-// });
+const storageLayer = new TorusStorageLayer({
+  hostUrl: "https://metadata.tor.us",
+});
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
@@ -42,7 +43,7 @@ const tKey = new TKey({
   },
   manualSync: true,
   serviceProvider,
-  // storageLayer,
+  storageLayer,
 });
 
 // const coreKitInstance = new Web3AuthMPCCoreKit({
