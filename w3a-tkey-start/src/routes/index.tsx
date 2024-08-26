@@ -150,7 +150,7 @@ const Home: Component = () => {
       }
 
       const ed25519key = getED25519Key(
-        reconstructedKey.secp256k1Key.toString(),
+        reconstructedKey.secp256k1Key.toString("hex"),
       ).sk.toString("hex");
 
       const privateKeyProvider = new SolanaPrivateKeyProvider({
