@@ -21,20 +21,6 @@ import {
 
 import RPC from "../lib/solana-rpc";
 
-const chainConfig = {
-  chainNamespace: CHAIN_NAMESPACES.SOLANA,
-  chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-  rpcTarget: "https://api.devnet.solana.com",
-  displayName: "Solana Devnet",
-  blockExplorerUrl: "https://explorer.solana.com",
-  ticker: "SOL",
-  tickerName: "Solana Token",
-  logo: "SOL",
-};
-const privateKeyProvider = new SolanaPrivateKeyProvider({
-  config: { chainConfig },
-});
-
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 
@@ -44,40 +30,19 @@ const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
 const redirectUrl = "https://w3a-nomodal-start.pages.dev";
 
-const openloginAdapter = new OpenloginAdapter({
-  privateKeyProvider,
-  adapterSettings: {
-    loginConfig: {
-      google: {
-        name: "Google",
-        typeOfLogin: "jwt",
-        clientId: auth0ClientId,
-        verifier: aggregateVerifierIdentifier,
-        verifierSubIdentifier: "w3a-a0-google",
-        jwtParameters: {
-          redirect_uri: redirectUrl,
-          connection: "google-oauth2",
-          domain: auth0domainUrl,
-          verifierIdField: "email",
-        },
-      },
-      discord: {
-        name: "Discord",
-        typeOfLogin: "discord",
-        verifier: aggregateVerifierIdentifier,
-        verifierSubIdentifier: "w3a-discord",
-        clientId: "1275709031138463754",
-      },
-    },
-    uxMode: UX_MODE.REDIRECT,
-    redirectUrl,
-  },
-});
-
 export const W3Auth: VoidComponent = () => {
   const [web3auth, setWeb3auth] = createSignal<IWeb3Auth | undefined>();
   const [provider, setProvider] = createSignal<IProvider | undefined>();
   const [loggedIn, setLoggedIn] = createSignal<boolean>(false);
+
+  const status = createMemo(() => {
+    const web3 = web3auth();
+    return web3?.status;
+  });
+
+  createEffect(() => {
+    console.log({ status: status() });
+  });
 
   const rpc = createMemo(() => {
     const prov = provider();
@@ -93,9 +58,49 @@ export const W3Auth: VoidComponent = () => {
   onMount(async () => {
     console.log("on mount!");
     try {
-      console.log({ chainConfig });
+      const chainConfig = {
+        chainNamespace: CHAIN_NAMESPACES.SOLANA,
+        chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+        rpcTarget: "https://api.devnet.solana.com",
+        displayName: "Solana Devnet",
+        blockExplorerUrl: "https://explorer.solana.com",
+        ticker: "SOL",
+        tickerName: "Solana Token",
+        logo: "SOL",
+      };
+      const privateKeyProvider = new SolanaPrivateKeyProvider({
+        config: { chainConfig },
+      });
 
-      console.log({ privateKeyProvider });
+      const openloginAdapter = new OpenloginAdapter({
+        privateKeyProvider,
+        adapterSettings: {
+          loginConfig: {
+            google: {
+              name: "Google",
+              typeOfLogin: "jwt",
+              clientId: auth0ClientId,
+              verifier: aggregateVerifierIdentifier,
+              verifierSubIdentifier: "w3a-a0-google",
+              jwtParameters: {
+                redirect_uri: redirectUrl,
+                connection: "google-oauth2",
+                domain: auth0domainUrl,
+                verifierIdField: "email",
+              },
+            },
+            discord: {
+              name: "Discord",
+              typeOfLogin: "discord",
+              verifier: aggregateVerifierIdentifier,
+              verifierSubIdentifier: "w3a-discord",
+              clientId: "1275709031138463754",
+            },
+          },
+          uxMode: UX_MODE.REDIRECT,
+          redirectUrl,
+        },
+      });
 
       const web3auth = new Web3AuthNoModal({
         clientId: web3AuthClientId,
