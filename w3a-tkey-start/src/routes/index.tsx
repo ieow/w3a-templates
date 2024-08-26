@@ -38,7 +38,7 @@ const serviceProvider = new TorusServiceProvider({
   customAuthArgs: {
     web3AuthClientId,
     baseUrl: window.location.origin,
-    redirectPathName: "/",
+    redirectPathName: "",
     enableLogging: true,
     uxMode: "redirect",
     network: TORUS_SAPPHIRE_NETWORK.SAPPHIRE_DEVNET,
@@ -87,7 +87,8 @@ const Home: Component = () => {
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
         window.location.hash.includes("#state") ||
-        window.location.hash.includes("#access_token")
+        window.location.hash.includes("#access_token") ||
+        window.location.hash.includes("#token_type")
       ) {
         let result = await (
           tKey.serviceProvider as TorusServiceProvider
