@@ -75,8 +75,6 @@ const Home: Component = () => {
         skipPrefetch: true,
       });
 
-      await tKey.initialize();
-      await reconstructKey();
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
         window.location.hash.includes("#state") ||
