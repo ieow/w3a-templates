@@ -2,24 +2,26 @@ import { Component, createEffect, createSignal, onMount } from "solid-js";
 import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
 import { SecurityQuestionsModule } from "@tkey/security-questions";
-import { TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
+import { KEY_TYPE, TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
-import { TorusStorageLayer } from "@tkey/storage-layer-torus";
+// import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
+import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
+import { BN } from "bn.js";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
 const securityQuestionsModule = new SecurityQuestionsModule();
-const storageLayer = new TorusStorageLayer({
-  hostUrl: "https://metadata.tor.us",
-});
+// const storageLayer = new TorusStorageLayer({
+//   hostUrl: "https://metadata.tor.us",
+// });
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
-const redirect_uri = "https://w3a-tkey-start.pages.dev/redirect";
+const redirect_uri = "https://w3a-tkey-start.pages.dev";
 const serviceProvider = new TorusServiceProvider({
   enableLogging: true,
   customAuthArgs: {
@@ -40,7 +42,7 @@ const tKey = new TKey({
   },
   manualSync: true,
   serviceProvider,
-  storageLayer,
+  // storageLayer,
 });
 
 // const coreKitInstance = new Web3AuthMPCCoreKit({
@@ -75,37 +77,43 @@ const Home: Component = () => {
 
       await tKey.initialize();
       await reconstructKey();
-      // // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
-      // if (
-      //   window.location.hash.includes("#state") ||
-      //   window.location.hash.includes("#access_token")
-      // ) {
-      //   let result = await (
-      //     tKey.serviceProvider as TorusServiceProvider
-      //   ).customAuthInstance.getRedirectResult();
-      //   console.log({ result });
-      //   // tKey.serviceProvider.postboxKey = new BN(
-      //   //   TorusUtils.getPostboxKey(result.result as TorusLoginResponse),
-      //   //   "hex",
-      //   // );
-      //   setLoginRes(result.result as TorusAggregateLoginResponse);
-      //   // Initialization of tKey
-      //   await tKey.initialize(); // 1/2 flow
-      //
-      //   setTKeyInitialised(true);
-      //
-      //   const { requiredShares } = tKey.getKeyDetails();
-      //   console.log({ requiredShares });
-      //
-      //   if (requiredShares > 0) {
-      //     uiConsole(
-      //       "Please enter your backup shares, requiredShares:",
-      //       requiredShares,
-      //     );
-      //   } else {
-      //     await reconstructKey();
-      //   }
-      // }
+      // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
+      if (
+        window.location.hash.includes("#state") ||
+        window.location.hash.includes("#access_token")
+      ) {
+        let result = await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.getRedirectResult();
+        console.log({ result });
+        const res = result.result as TorusAggregateLoginResponse;
+        tKey.serviceProvider.postboxKey = new BN(
+          getPostboxKeyFrom1OutOf1(
+            getKeyCurve(KEY_TYPE.ED25519),
+            res.postboxKeyData.privKey,
+            res.metadata.nonce.toString("hex"),
+          ),
+          "hex",
+        );
+
+        setLoginRes(res);
+        // Initialization of tKey
+        await tKey.initialize(); // 1/2 flow
+
+        setTKeyInitialised(true);
+
+        const { requiredShares } = tKey.getKeyDetails();
+        console.log({ requiredShares });
+
+        if (requiredShares > 0) {
+          uiConsole(
+            "Please enter your backup shares, requiredShares:",
+            requiredShares,
+          );
+        } else {
+          await reconstructKey();
+        }
+      }
     } catch (error) {
       console.error(error);
     }
