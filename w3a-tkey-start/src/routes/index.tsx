@@ -1,6 +1,7 @@
 import {
   Component,
   Show,
+  batch,
   createEffect,
   createMemo,
   createSignal,
@@ -11,7 +12,10 @@ import { WebStorageModule } from "@tkey/web-storage";
 import { SecurityQuestionsModule } from "@tkey/security-questions";
 import { KEY_TYPE, TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
-import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
+import {
+  TorusAggregateLoginResponse,
+  TorusVerifierResponse,
+} from "@toruslabs/customauth";
 import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
 import { BN } from "bn.js";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
@@ -64,6 +68,7 @@ const Home: Component = () => {
   const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
   const [loginRes, setLoginRes] = createSignal<TorusAggregateLoginResponse>();
   const [provider, setProvider] = createSignal<SolanaPrivateKeyProvider>();
+  const [userInfo, setUserInfo] = createSignal<TorusVerifierResponse>();
 
   createEffect(() => {
     console.log({ initialised: tkeyInitialised(), loginRes: loginRes() });
@@ -166,11 +171,8 @@ const Home: Component = () => {
           result.hashParameters?.scope ?? "local_scope",
         );
 
-        setLoginRes(res);
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
-
-        setTKeyInitialised(true);
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
@@ -183,6 +185,12 @@ const Home: Component = () => {
         } else {
           await reconstructKey();
         }
+
+        batch(() => {
+          setTKeyInitialised(true);
+          setLoginRes(res);
+          setUserInfo(res.userInfo[0]);
+        });
       }
     } catch (error) {
       console.error(error);
@@ -811,9 +819,9 @@ const Home: Component = () => {
   // 	setUserInfo({});
   // 	uiConsole("logged out");
   // };
-  // const getUserInfo = async () => {
-  // 	uiConsole(userInfo);
-  // };
+  const getUserInfo = async () => {
+    uiConsole(userInfo());
+  };
   //
   // const getChainID = async () => {
   // 	if (!provider) {
@@ -1104,7 +1112,7 @@ const Home: Component = () => {
           <>
             <div class="flex-container">
               <div>
-                <button onClick={() => {}} class="card">
+                <button onClick={getUserInfo} class="card">
                   Get User Info
                 </button>
               </div>
