@@ -20,12 +20,6 @@ export default defineConfig({
     define: {
       global: "globalThis",
     },
-    optimizeDeps: {
-      include: ["@web3auth/*"],
-    },
-    ssr: {
-      noExternal: [/^(web3auth|@web3auth\/.*)$/],
-    },
     // ssr: {
     // noExternal: [/@web3auth/, /toruslabs/, /events/],
     // optimizeDeps: {
