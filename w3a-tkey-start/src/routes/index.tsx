@@ -92,7 +92,10 @@ const Home: Component = () => {
       ) {
         let result = await (
           tKey.serviceProvider as TorusServiceProvider
-        ).customAuthInstance.getRedirectResult();
+        ).customAuthInstance.getRedirectResult({
+          clearLoginDetails: true,
+          replaceUrl: true,
+        });
 
         console.log({ result });
         const res = result.result as TorusAggregateLoginResponse;
@@ -121,6 +124,7 @@ const Home: Component = () => {
           ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
             result.hashParameters?.scope ?? "local_scope",
           );
+
           console.log("cleared login details of scope!");
           return;
         }
