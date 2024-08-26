@@ -116,7 +116,6 @@ export const W3Auth: VoidComponent = () => {
         web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
       });
 
-      setWeb3auth(web3auth);
       web3auth.configureAdapter(openloginAdapter);
 
       setProvider(web3auth.provider ?? undefined);
@@ -133,6 +132,8 @@ export const W3Auth: VoidComponent = () => {
         console.error("### web3auth error", error);
       });
       await web3auth.init();
+
+      setWeb3auth(web3auth);
 
       console.log("connected: ", { connected: web3auth.connected });
     } catch (error) {
