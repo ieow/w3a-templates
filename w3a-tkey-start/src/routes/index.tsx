@@ -135,7 +135,7 @@ const Home: Component = () => {
             return;
           }
 
-          if (!("accessToken" in result.hashParameters)) {
+          if (!("access_token" in result.hashParameters)) {
             console.log(
               "no access token in hash parameters, cannot revoke token!",
             );
@@ -143,7 +143,7 @@ const Home: Component = () => {
           }
 
           const revokeRes = await revokeDiscordToken(
-            result.hashParameters.accessToken,
+            result.hashParameters.access_token,
           ).then((r) => r.json());
           console.log("revoke res: ", { revokeRes });
 
