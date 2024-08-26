@@ -35,6 +35,12 @@ importers:
       '@toruslabs/constants':
         specifier: ^14.0.0
         version: 14.0.0(@babel/runtime@7.25.0)
+      '@toruslabs/customauth':
+        specifier: ^20.1.1
+        version: 20.1.1(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@toruslabs/torus.js':
+        specifier: ^15.0.2
+        version: 15.0.2(@babel/runtime@7.25.0)
       '@web3auth/solana-provider':
         specifier: ^8.12.4
         version: 8.12.4(@babel/runtime@7.25.0)(@solana/web3.js@1.95.3(bufferutil@4.0.8)(encoding@0.1.12)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(utf-8-validate@5.0.10)

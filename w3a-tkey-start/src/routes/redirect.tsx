@@ -1,19 +1,46 @@
-import { onMount } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { A, useNavigate } from "@solidjs/router";
 
-// const web3AuthClientId =
-//   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
+import { TKeyDefault } from "@tkey/default";
+import { WebStorageModule } from "@tkey/web-storage";
+import { SecurityQuestionsModule } from "@tkey/security-questions";
+import { TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
+import { TorusServiceProvider } from "@tkey/service-provider-torus";
+import { BN } from "bn.js";
+import { TorusLoginResponse } from "@toruslabs/customauth";
+import TorusUtils from "@toruslabs/torus.js";
 
-// const coreKitInstance = new Web3AuthMPCCoreKit({
-//   web3AuthClientId,
-//   web3AuthNetwork: WEB3AUTH_NETWORK.DEVNET,
-//   storage: window.localStorage,
-//   manualSync: true,
-//   tssLib,
-//   uxMode: "redirect",
-//   baseUrl: "https://w3a-templates.pages.dev",
-//   redirectPathName: "redirect",
-// });
+const web3AuthClientId =
+  "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
+// Configuration of Modules
+const webStorageModule = new WebStorageModule();
+const securityQuestionsModule = new SecurityQuestionsModule();
+
+// const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
+// const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
+// const aggregateVerifierIdentifier = "w3a-universal-verifier";
+// const redirect_uri = "https://w3a-tkey-start.pages.dev/redirect";
+const serviceProvider = new TorusServiceProvider({
+  enableLogging: true,
+  customAuthArgs: {
+    web3AuthClientId,
+    baseUrl: window.location.origin,
+    redirectPathName: "redirect",
+    enableLogging: true,
+    uxMode: "redirect",
+    network: TORUS_SAPPHIRE_NETWORK.SAPPHIRE_DEVNET,
+  },
+});
+
+// Instantiation of tKey
+const tKey = new TKeyDefault({
+  modules: {
+    webStorage: webStorageModule,
+    securityQuestions: securityQuestionsModule,
+  },
+  manualSync: true,
+  serviceProvider,
+});
 
 export default function Redirect() {
   // const [coreKitStatus, setCoreKitStatus] = createSignal<COREKIT_STATUS>(
@@ -22,9 +49,51 @@ export default function Redirect() {
   // const [backupFactorKey, setBackupFactorKey] = createSignal<string>("");
   // const [mnemonicFactor, setMnemonicFactor] = createSignal<string>("");
 
+  const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
+  const [userInfo, setUserInfo] = createSignal<any>();
+
   // decide whether to rehydrate session
   // const rehydrate = true;
   onMount(async () => {
+    try {
+      await (tKey.serviceProvider as TorusServiceProvider).init({
+        skipSw: true,
+        skipPrefetch: true,
+      });
+
+      // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
+      if (
+        window.location.hash.includes("#state") ||
+        window.location.hash.includes("#access_token")
+      ) {
+        let result = await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.getRedirectResult();
+        console.log({ result });
+        // tKey.serviceProvider.postboxKey = new BN(
+        //   TorusUtils.getPostboxKey(result.result as TorusLoginResponse),
+        //   "hex",
+        // );
+        setUserInfo((result.result as any).userInfo);
+        // Initialization of tKey
+        await tKey.initialize(); // 1/2 flow
+
+        setTKeyInitialised(true);
+
+        var { requiredShares } = tKey.getKeyDetails();
+
+        if (requiredShares > 0) {
+          uiConsole(
+            "Please enter your backup shares, requiredShares:",
+            requiredShares,
+          );
+        } else {
+          await reconstructKey();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
     // // Example config to handle redirect result manually
     // await coreKitInstance.init({ handleRedirectResult: false, rehydrate });
     // if (
@@ -57,6 +126,21 @@ export default function Redirect() {
     // //   uiConsole("security question not set");
     // // }
   });
+
+  const reconstructKey = async () => {
+    try {
+      const reconstructedKey = await tKey.reconstructKey();
+      console.log({ reconstructedKey });
+      // const privateKey = reconstructedKey?.allKeys.toString('hex');
+
+      // await ethereumPrivateKeyProvider.setupProvider(privateKey);
+      // setProvider(ethereumPrivateKeyProvider);
+      // setLoggedIn(true);
+      // setDeviceShare();
+    } catch (e) {
+      uiConsole(e);
+    }
+  };
 
   // const inputBackupFactorKey = async () => {
   //   if (!coreKitInstance) {
@@ -136,6 +220,14 @@ export default function Redirect() {
   //     }
   //   }),
   // );
+
+  const uiConsole = (...args: any[]): void => {
+    const el = document.querySelector("#console>p");
+    if (el) {
+      el.innerHTML = JSON.stringify(args || {}, null, 2);
+    }
+    console.log(...args);
+  };
 
   return (
     <main class="text-center mx-auto text-gray-700 p-4">
