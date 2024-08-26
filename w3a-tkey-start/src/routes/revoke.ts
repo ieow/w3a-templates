@@ -1,7 +1,7 @@
 const DISCORD_CLIENT_ID = "1275709031138463754";
 const DISCORD_CLIENT_SECRET = "o3E7TBYnYza3h1BJ962IiQ_hRoJBpuiD";
 
-async function revokeDiscordToken(token: string) {
+export async function revokeDiscordToken(token: string) {
   const formData = new FormData();
   formData.append("token", token);
   const res = await fetch("https://discord.com/api/oauth2/token/revoke", {

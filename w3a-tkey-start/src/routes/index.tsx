@@ -22,6 +22,7 @@ import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
 import { getED25519Key } from "@toruslabs/openlogin-ed25519";
 
+import { revokeDiscordToken } from "./revoke";
 import SolanaRpc from "./rpc";
 
 const web3AuthClientId =
