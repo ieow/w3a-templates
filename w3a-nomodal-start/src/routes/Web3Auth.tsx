@@ -135,26 +135,26 @@ export const W3Auth: VoidComponent = () => {
     console.log({ web3authProvider });
     setProvider(web3authProvider ?? undefined);
   };
-  //
-  // const authenticateUser = async () => {
-  //   const auth = web3auth();
-  //   if (!auth) {
-  //     uiConsole("web3auth not initialized yet");
-  //     return;
-  //   }
-  //   const idToken = await auth.authenticateUser();
-  //   uiConsole(idToken);
-  // };
-  //
-  // const getUserInfo = async () => {
-  //   const auth = web3auth();
-  //   if (!auth) {
-  //     uiConsole("web3auth not initialized yet");
-  //     return;
-  //   }
-  //   const user = await auth.getUserInfo();
-  //   uiConsole(user);
-  // };
+
+  const authenticateUser = async () => {
+    const auth = web3auth();
+    if (!auth) {
+      uiConsole("web3auth not initialized yet");
+      return;
+    }
+    const idToken = await auth.authenticateUser();
+    uiConsole(idToken);
+  };
+
+  const getUserInfo = async () => {
+    const auth = web3auth();
+    if (!auth) {
+      uiConsole("web3auth not initialized yet");
+      return;
+    }
+    const user = await auth.getUserInfo();
+    uiConsole(user);
+  };
   //
   // const logout = async () => {
   //   const auth = web3auth();
@@ -167,27 +167,27 @@ export const W3Auth: VoidComponent = () => {
   //   setLoggedIn(false);
   // };
   //
-  // const getAccounts = async () => {
-  //   const prov = provider();
-  //   if (!prov) {
-  //     uiConsole("provider not initialized yet");
-  //     return;
-  //   }
-  //   const rpc = new RPC(prov);
-  //   const address = await rpc.getAccounts();
-  //   uiConsole(address);
-  // };
-  //
-  // const getBalance = async () => {
-  //   const _rpc = rpc();
-  //   if (!_rpc) {
-  //     uiConsole("provider not initialized yet");
-  //     return;
-  //   }
-  //   const balance = await _rpc.getBalance();
-  //   uiConsole(balance);
-  // };
-  //
+  const getAccounts = async () => {
+    const prov = provider();
+    if (!prov) {
+      uiConsole("provider not initialized yet");
+      return;
+    }
+    const rpc = new RPC(prov);
+    const address = await rpc.getAccounts();
+    uiConsole(address);
+  };
+
+  const getBalance = async () => {
+    const _rpc = rpc();
+    if (!_rpc) {
+      uiConsole("provider not initialized yet");
+      return;
+    }
+    const balance = await _rpc.getBalance();
+    uiConsole(balance);
+  };
+
   // const sendTransaction = async () => {
   //   const _rpc = rpc();
   //   if (!_rpc) {
@@ -258,16 +258,16 @@ export const W3Auth: VoidComponent = () => {
   //   uiConsole(signedMessage);
   // };
   //
-  // const getPrivateKey = async () => {
-  //   const _rpc = rpc();
-  //   if (!_rpc) {
-  //     uiConsole("provider not initialized yet");
-  //     return;
-  //   }
-  //   const privateKey = await _rpc.getPrivateKey();
-  //   uiConsole(privateKey);
-  // };
-  //
+  const getPrivateKey = async () => {
+    const _rpc = rpc();
+    if (!_rpc) {
+      uiConsole("provider not initialized yet");
+      return;
+    }
+    const privateKey = await _rpc.getPrivateKey();
+    uiConsole(privateKey);
+  };
+
   return (
     <main class="m-auto px-8 w-3/5">
       <h1 class="text-3xl text-center m-12">
@@ -307,6 +307,33 @@ export const W3Auth: VoidComponent = () => {
           }
         >
           <>
+            <div class="flex-container">
+              <div>
+                <button onClick={getUserInfo} class="card">
+                  Get User Info
+                </button>
+              </div>
+              <div>
+                <button onClick={authenticateUser} class="card">
+                  Get ID Token
+                </button>
+              </div>
+              <div>
+                <button onClick={getAccounts} class="card">
+                  Get Accounts
+                </button>
+              </div>
+              <div>
+                <button onClick={getBalance} class="card">
+                  Get Balance
+                </button>
+              </div>
+              <div>
+                <button onClick={getPrivateKey} class="card">
+                  Get Private Key
+                </button>
+              </div>
+            </div>
             {/*
 
 
