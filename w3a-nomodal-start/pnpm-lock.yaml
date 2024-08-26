@@ -18,16 +18,16 @@ importers:
         specifier: ^1.0.6
         version: 1.0.6(rollup@4.21.0)(solid-js@1.8.21)(vinxi@0.4.1(@types/node@22.4.2)(ioredis@5.4.1)(terser@5.31.6))(vite@5.4.2(@types/node@22.4.2)(terser@5.31.6))
       '@web3auth/base':
-        specifier: ^8.12.2
+        specifier: ^8.12.0
         version: 8.12.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@web3auth/no-modal':
-        specifier: ^8.12.3
+        specifier: ^8.12.0
         version: 8.12.3(@babel/runtime@7.25.0)(@web3auth/openlogin-adapter@8.12.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@web3auth/openlogin-adapter':
-        specifier: ^8.12.2
+        specifier: ^8.12.0
         version: 8.12.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@web3auth/solana-provider':
-        specifier: ^8.12.2
+        specifier: ^8.12.0
         version: 8.12.2(@babel/runtime@7.25.0)(@solana/web3.js@1.95.3(bufferutil@4.0.8)(utf-8-validate@5.0.10))(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       autoprefixer:
         specifier: ^10.4.19
