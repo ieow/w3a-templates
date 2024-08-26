@@ -97,6 +97,9 @@ export const W3Auth: VoidComponent = () => {
               clientId: "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl",
               verifier: aggregateVerifierIdentifier,
               verifierSubIdentifier: "w3a-a0-google",
+              jwtParameters: {
+                domain: "https://dev-n82s5hbtzoxieejz.us.auth0.com",
+              },
             },
             discord: {
               name: "Discord",
