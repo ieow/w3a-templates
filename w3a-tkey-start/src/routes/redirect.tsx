@@ -3,17 +3,17 @@ import { A, useNavigate } from "@solidjs/router";
 
 import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
-import { SecurityQuestionsModule } from "@tkey/security-questions";
-import { TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
+import { KEY_TYPE, TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
 import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
+import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
+import { BN } from "bn.js";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
-const securityQuestionsModule = new SecurityQuestionsModule();
 const storageLayer = new TorusStorageLayer({
   hostUrl: "https://metadata.tor.us",
 });
@@ -38,7 +38,6 @@ const serviceProvider = new TorusServiceProvider({
 const tKey = new TKey({
   modules: {
     webStorage: webStorageModule,
-    securityQuestions: securityQuestionsModule,
   },
   manualSync: true,
   serviceProvider,
@@ -74,11 +73,17 @@ export default function Redirect() {
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.getRedirectResult();
         console.log({ result });
-        // tKey.serviceProvider.postboxKey = new BN(
-        //   TorusUtils.getPostboxKey(result.result as TorusLoginResponse),
-        //   "hex",
-        // );
-        setLoginRes(result.result as TorusAggregateLoginResponse);
+        const res = result.result as TorusAggregateLoginResponse;
+        tKey.serviceProvider.postboxKey = new BN(
+          getPostboxKeyFrom1OutOf1(
+            getKeyCurve(KEY_TYPE.ED25519),
+            res.postboxKeyData.privKey,
+            res.metadata.nonce.toString("hex"),
+          ),
+          "hex",
+        );
+
+        setLoginRes(res);
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
 
