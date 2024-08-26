@@ -91,6 +91,8 @@ export const W3Auth: VoidComponent = () => {
         adapterSettings: {
           network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           uxMode: UX_MODE.POPUP,
+          redirectUrl:
+            "https://dev-n82s5hbtzoxieejz.us.auth0.com/login/callback",
           // redirectUrl,
           loginConfig: {
             google: {
@@ -155,6 +157,8 @@ export const W3Auth: VoidComponent = () => {
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "google",
       extraLoginOptions: {
+        redirect_uri:
+          "https://dev-n82s5hbtzoxieejz.us.auth0.com/login/callback",
         domain: auth0domainUrl,
         // this corresponds to the field inside jwt which must be used to uniquely
         // identify the user. This is mapped b/w google and github logins
