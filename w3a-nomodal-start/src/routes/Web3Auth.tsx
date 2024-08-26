@@ -67,6 +67,7 @@ const openloginAdapter = new OpenloginAdapter({
       },
     },
     uxMode: UX_MODE.REDIRECT,
+    redirectUrl: "https://w3a-nomodal-start.pages.dev",
   },
 });
 
@@ -103,7 +104,7 @@ export const W3Auth: VoidComponent = () => {
       web3auth.configureAdapter(openloginAdapter);
 
       await web3auth.init();
-      // setProvider(web3auth.provider ?? undefined);
+      setProvider(web3auth.provider ?? undefined);
       if (web3auth.connected) {
         setLoggedIn(true);
       }
@@ -296,7 +297,7 @@ export const W3Auth: VoidComponent = () => {
             <button
               onClick={async () => {
                 console.log("login pressed!");
-                // await login();
+                await login();
               }}
               class="card"
             >
