@@ -135,7 +135,8 @@ export const W3Auth: VoidComponent = () => {
 
       setWeb3auth(web3auth);
 
-      console.log("connected: ", { connected: web3auth.connected });
+      const userInfo = await web3auth.getUserInfo();
+      console.log({ connected: web3auth.connected, userInfo });
     } catch (error) {
       console.error(error);
     }
