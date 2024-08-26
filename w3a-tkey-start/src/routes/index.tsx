@@ -93,9 +93,9 @@ const Home: Component = () => {
         let result = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.getRedirectResult();
-        const res = result.result as TorusAggregateLoginResponse;
 
-        console.log({ res });
+        console.log({ result });
+        const res = result.result as TorusAggregateLoginResponse;
 
         if (!("postboxKeyData" in res)) {
           console.log("privKey missing!");
@@ -103,8 +103,7 @@ const Home: Component = () => {
           const loginDetails = await (
             tKey.serviceProvider as TorusServiceProvider
           ).customAuthInstance.storageHelper.retrieveLoginDetails(
-            "",
-            // result.hashParameters?.scope ?? "local_scope",
+            result.hashParameters?.scope ?? "local_scope",
           );
 
           console.log({ loginDetails });
