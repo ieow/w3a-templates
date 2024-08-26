@@ -1,10 +1,11 @@
-import { Component, onMount } from "solid-js";
+import { Component, createEffect, createSignal, onMount } from "solid-js";
 import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
 import { SecurityQuestionsModule } from "@tkey/security-questions";
 import { TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
+import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
@@ -58,14 +59,79 @@ const Home: Component = () => {
   //   COREKIT_STATUS.NOT_INITIALIZED,
   // );
   //
-  onMount(async () => {
-    console.log({ tKey });
-    await (tKey.serviceProvider as TorusServiceProvider).init({
-      skipSw: true,
-      skipPrefetch: true,
-    });
-    // await tKey.initialize();
+  const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
+  const [loginRes, setLoginRes] = createSignal<TorusAggregateLoginResponse>();
+
+  createEffect(() => {
+    console.log({ initialised: tkeyInitialised(), loginRes: loginRes() });
   });
+
+  onMount(async () => {
+    try {
+      await (tKey.serviceProvider as TorusServiceProvider).init({
+        skipSw: true,
+        skipPrefetch: true,
+      });
+
+      await tKey.initialize();
+      await reconstructKey();
+      // // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
+      // if (
+      //   window.location.hash.includes("#state") ||
+      //   window.location.hash.includes("#access_token")
+      // ) {
+      //   let result = await (
+      //     tKey.serviceProvider as TorusServiceProvider
+      //   ).customAuthInstance.getRedirectResult();
+      //   console.log({ result });
+      //   // tKey.serviceProvider.postboxKey = new BN(
+      //   //   TorusUtils.getPostboxKey(result.result as TorusLoginResponse),
+      //   //   "hex",
+      //   // );
+      //   setLoginRes(result.result as TorusAggregateLoginResponse);
+      //   // Initialization of tKey
+      //   await tKey.initialize(); // 1/2 flow
+      //
+      //   setTKeyInitialised(true);
+      //
+      //   const { requiredShares } = tKey.getKeyDetails();
+      //   console.log({ requiredShares });
+      //
+      //   if (requiredShares > 0) {
+      //     uiConsole(
+      //       "Please enter your backup shares, requiredShares:",
+      //       requiredShares,
+      //     );
+      //   } else {
+      //     await reconstructKey();
+      //   }
+      // }
+    } catch (error) {
+      console.error(error);
+    }
+    // // try {
+    // //   let result = securityQuestion.getQuestion(coreKitInstance!);
+    // //   setQuestion(result);
+    // //   uiConsole("security question set");
+    // // } catch (e) {
+    // //   uiConsole("security question not set");
+    // // }
+  });
+
+  const reconstructKey = async () => {
+    try {
+      const reconstructedKey = await tKey.reconstructKey();
+      console.log({ reconstructedKey });
+      // const privateKey = reconstructedKey?.allKeys.toString('hex');
+
+      // await ethereumPrivateKeyProvider.setupProvider(privateKey);
+      // setProvider(ethereumPrivateKeyProvider);
+      // setLoggedIn(true);
+      // setDeviceShare();
+    } catch (e) {
+      uiConsole(e);
+    }
+  };
   // onMount(async () => {
   //   console.log("initialigin core kit instance!!");
   //   await coreKitInstance.init();

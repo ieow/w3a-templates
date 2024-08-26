@@ -1,5 +1,5 @@
-import { createSignal, onMount } from "solid-js";
-import { A } from "@solidjs/router";
+import { createEffect, createSignal, onMount } from "solid-js";
+import { A, useNavigate } from "@solidjs/router";
 
 import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
@@ -52,7 +52,8 @@ export default function Redirect() {
   // const [backupFactorKey, setBackupFactorKey] = createSignal<string>("");
   // const [mnemonicFactor, setMnemonicFactor] = createSignal<string>("");
 
-  const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
+  const navigate = useNavigate();
+  const [, setTKeyInitialised] = createSignal(false);
   const [loginRes, setLoginRes] = createSignal<TorusAggregateLoginResponse>();
 
   // decide whether to rehydrate session
@@ -105,6 +106,12 @@ export default function Redirect() {
     // // } catch (e) {
     // //   uiConsole("security question not set");
     // // }
+    await new Promise((r) => setTimeout(r, 3000));
+    navigate("/");
+  });
+
+  createEffect(() => {
+    console.log({ res: loginRes() });
   });
 
   const reconstructKey = async () => {
