@@ -47,6 +47,7 @@ const serviceProvider = new TorusServiceProvider({
     enableLogging: true,
     uxMode: "redirect",
     network: TORUS_SAPPHIRE_NETWORK.SAPPHIRE_DEVNET,
+    keyType: KEY_TYPE.ED25519,
   },
 });
 
