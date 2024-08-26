@@ -95,18 +95,6 @@ const Home: Component = () => {
         ).customAuthInstance.getRedirectResult();
         const res = result.result as TorusAggregateLoginResponse;
 
-        if ("error" in res) {
-          const loginDetails = await (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.retrieveLoginDetails(
-            "",
-            // result.hashParameters?.scope ?? "local_scope",
-          );
-
-          console.log({ loginDetails });
-          return;
-        }
-
         tKey.serviceProvider.postboxKey = new BN(
           getPostboxKeyFrom1OutOf1(
             getKeyCurve(KEY_TYPE.ED25519),
@@ -142,6 +130,20 @@ const Home: Component = () => {
       }
     } catch (error) {
       console.error(error);
+      if (
+        error instanceof Error &&
+        error.message.includes("Duplicate token found")
+      ) {
+        const loginDetails = await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.storageHelper.retrieveLoginDetails(
+          "",
+          // result.hashParameters?.scope ?? "local_scope",
+        );
+
+        console.log({ loginDetails });
+        return;
+      }
     }
     // // try {
     // //   let result = securityQuestion.getQuestion(coreKitInstance!);
