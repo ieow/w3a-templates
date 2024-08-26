@@ -90,7 +90,7 @@ export const W3Auth: VoidComponent = () => {
         privateKeyProvider,
         adapterSettings: {
           network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
-          uxMode: UX_MODE.REDIRECT,
+          uxMode: UX_MODE.POPUP,
           // redirectUrl,
           loginConfig: {
             google: {
