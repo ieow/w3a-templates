@@ -28,7 +28,7 @@ const serviceProvider = new TorusServiceProvider({
 });
 
 // Instantiation of tKey
-export const tKey = new TKeyDefault({
+const tKey = new TKeyDefault({
   modules: {
     webStorage: webStorageModule,
     securityQuestions: securityQuestionsModule,
@@ -54,6 +54,7 @@ const Home: Component = () => {
   // );
   //
   onMount(async () => {
+    console.log({ tKey });
     await (tKey.serviceProvider as TorusServiceProvider).init({
       skipSw: true,
       skipPrefetch: true,
