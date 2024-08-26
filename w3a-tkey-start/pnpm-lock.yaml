@@ -44,6 +44,9 @@ importers:
       '@toruslabs/customauth':
         specifier: ^20.1.1
         version: 20.1.1(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@toruslabs/openlogin-ed25519':
+        specifier: ^8.1.0
+        version: 8.1.0(@babel/runtime@7.25.0)
       '@toruslabs/torus.js':
         specifier: ^15.0.2
         version: 15.0.2(@babel/runtime@7.25.0)

@@ -16,6 +16,7 @@ import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
 import { BN } from "bn.js";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
+import { getED25519Key } from "@toruslabs/openlogin-ed25519";
 
 import SolanaRpc from "./rpc";
 
@@ -142,12 +143,15 @@ const Home: Component = () => {
     try {
       const reconstructedKey = await tKey.reconstructKey();
       console.log({ reconstructedKey });
-      const privKey = reconstructedKey.ed25519Seed;
-      if (!privKey) {
-        console.error("failed to reconstruct allKeys!");
+      const seed = reconstructedKey.ed25519Seed;
+      if (!seed) {
+        console.error("failed to reconstruct ed25519 seed!");
         return;
       }
-      const privateKey = privKey.toString("hex");
+
+      const ed25519key = getED25519Key(
+        reconstructedKey.secp256k1Key.toString(),
+      ).sk.toString("hex");
 
       const privateKeyProvider = new SolanaPrivateKeyProvider({
         config: {
@@ -164,7 +168,7 @@ const Home: Component = () => {
         },
       });
 
-      await privateKeyProvider.setupProvider(privateKey);
+      await privateKeyProvider.setupProvider(ed25519key);
       console.log({ privateKeyProvider });
       setProvider(privateKeyProvider);
       // setLoggedIn(true);
