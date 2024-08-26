@@ -97,7 +97,7 @@ const Home: Component = () => {
         console.log({ result });
         const res = result.result as TorusAggregateLoginResponse;
 
-        if ("error" in res) {
+        if ("error" in result) {
           console.log("privKey missing!");
 
           const loginDetails = await (
