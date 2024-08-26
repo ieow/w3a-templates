@@ -26,8 +26,6 @@ const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
-const googleClientId =
-  "910435925732-8lgkn203rm9j28j7v9kkni41h1pl3t44.apps.googleusercontent.com";
 
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
 // const redirectUrl = "https://w3a-nomodal-start.pages.dev";
@@ -98,7 +96,7 @@ export const W3Auth: VoidComponent = () => {
             google: {
               name: "Google",
               typeOfLogin: "jwt",
-              clientId: googleClientId,
+              clientId: "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl",
               verifier: aggregateVerifierIdentifier,
               verifierSubIdentifier: "w3a-a0-google",
             },
