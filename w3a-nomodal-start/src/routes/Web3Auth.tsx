@@ -15,6 +15,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
+  on,
   onMount,
 } from "solid-js";
 
@@ -41,6 +42,7 @@ const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
+const redirectUrl = "https://w3a-nomodal-start.pages.dev";
 
 const openloginAdapter = new OpenloginAdapter({
   privateKeyProvider,
@@ -53,7 +55,7 @@ const openloginAdapter = new OpenloginAdapter({
         verifier: aggregateVerifierIdentifier,
         verifierSubIdentifier: "w3a-a0-google",
         jwtParameters: {
-          redirect_uri: "https://w3a-nomodal-start.pages.dev",
+          redirect_uri: redirectUrl,
           connection: "google-oauth2",
           domain: auth0domainUrl,
           verifierIdField: "email",
@@ -68,7 +70,7 @@ const openloginAdapter = new OpenloginAdapter({
       },
     },
     uxMode: UX_MODE.REDIRECT,
-    redirectUrl: "https://w3a-nomodal-start.pages.dev",
+    redirectUrl,
   },
 });
 
@@ -132,7 +134,8 @@ export const W3Auth: VoidComponent = () => {
       return;
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-      loginProvider: "google",
+      loginProvider: "jwt",
+      redirectUrl,
     });
     console.log({ web3authProvider });
     setProvider(web3authProvider ?? undefined);
@@ -268,8 +271,16 @@ export const W3Auth: VoidComponent = () => {
       return;
     }
     const privateKey = await _rpc.getPrivateKey();
+    console.log({ privateKey });
     uiConsole(privateKey);
   };
+
+  createEffect(
+    on(provider, async (prov) => {
+      console.log({ provider: prov });
+      await getPrivateKey();
+    }),
+  );
 
   return (
     <main class="m-auto px-8 w-3/5">
