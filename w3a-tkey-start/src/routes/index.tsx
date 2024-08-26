@@ -98,7 +98,6 @@ const Home: Component = () => {
         });
 
         console.log({ result });
-        const res = result.result as TorusAggregateLoginResponse;
 
         if ("error" in result) {
           console.log("privKey missing!");
@@ -126,9 +125,32 @@ const Home: Component = () => {
           );
 
           console.log("cleared login details of scope!");
-          return;
+          if (!("hashParameters" in result) || !result.hashParameters) {
+            console.log("no hashParameters in result, cannot revoke token!");
+            return;
+          }
+
+          if (!("accessToken" in result.hashParameters)) {
+            console.log(
+              "no access token in hash parameters, cannot revoke token!",
+            );
+            return;
+          }
+
+          const revokeRes = await revokeDiscordToken(
+            result.hashParameters.accessToken,
+          ).then((r) => r.json());
+          console.log("revoke res: ", { revokeRes });
+
+          result = await (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.getRedirectResult({
+            clearLoginDetails: true,
+            replaceUrl: true,
+          });
         }
 
+        const res = result.result as TorusAggregateLoginResponse;
         tKey.serviceProvider.postboxKey = new BN(
           getPostboxKeyFrom1OutOf1(
             getKeyCurve(KEY_TYPE.ED25519),
