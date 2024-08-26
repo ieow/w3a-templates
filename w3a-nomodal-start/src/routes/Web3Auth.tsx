@@ -53,6 +53,7 @@ const openloginAdapter = new OpenloginAdapter({
         verifier: aggregateVerifierIdentifier,
         verifierSubIdentifier: "w3a-a0-google",
         jwtParameters: {
+          redirect_uri: "https://w3a-nomodal-start.pages.dev",
           connection: "google-oauth2",
           domain: auth0domainUrl,
           verifierIdField: "email",
