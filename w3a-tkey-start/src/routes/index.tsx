@@ -38,7 +38,7 @@ const serviceProvider = new TorusServiceProvider({
   customAuthArgs: {
     web3AuthClientId,
     baseUrl: window.location.origin,
-    redirectPathName: "redirect",
+    redirectPathName: " ",
     enableLogging: true,
     uxMode: "redirect",
     network: TORUS_SAPPHIRE_NETWORK.SAPPHIRE_DEVNET,
