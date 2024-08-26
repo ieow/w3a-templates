@@ -97,8 +97,17 @@ const Home: Component = () => {
 
         console.log({ res });
 
-        if (!("privKey" in res.postboxKeyData)) {
+        if (!("postboxKeyData" in res)) {
           console.log("privKey missing!");
+
+          const loginDetails = await (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.storageHelper.retrieveLoginDetails(
+            "",
+            // result.hashParameters?.scope ?? "local_scope",
+          );
+
+          console.log({ loginDetails });
           return;
         }
 
