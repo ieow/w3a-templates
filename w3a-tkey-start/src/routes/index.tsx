@@ -1,14 +1,23 @@
-import { Component, createEffect, createSignal, onMount } from "solid-js";
+import {
+  Component,
+  Show,
+  createEffect,
+  createMemo,
+  createSignal,
+  onMount,
+} from "solid-js";
 import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
 import { SecurityQuestionsModule } from "@tkey/security-questions";
 import { KEY_TYPE, TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
-// import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
 import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
 import { BN } from "bn.js";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
+import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
+
+import SolanaRpc from "./rpc";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
@@ -17,6 +26,21 @@ const webStorageModule = new WebStorageModule();
 const securityQuestionsModule = new SecurityQuestionsModule();
 const storageLayer = new TorusStorageLayer({
   hostUrl: "https://metadata.tor.us",
+});
+
+const privateKeyProvider = new SolanaPrivateKeyProvider({
+  config: {
+    chainConfig: {
+      chainNamespace: "solana",
+      chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+      rpcTarget: "https://api.devnet.solana.com",
+      displayName: "Solana Devnet",
+      blockExplorerUrl: "https://explorer.solana.com",
+      ticker: "SOL",
+      tickerName: "Solana Token",
+      logo: "",
+    },
+  },
 });
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
@@ -46,17 +70,6 @@ const tKey = new TKey({
   storageLayer,
 });
 
-// const coreKitInstance = new Web3AuthMPCCoreKit({
-//   web3AuthClientId,
-//   web3AuthNetwork: WEB3AUTH_NETWORK.DEVNET,
-//   storage: window.localStorage,
-//   manualSync: true,
-//   tssLib,
-//   uxMode: "redirect",
-//   baseUrl: "https://w3a-templates.pages.dev",
-//   redirectPathName: "redirect",
-// });
-
 const Home: Component = () => {
   // const [coreKitStatus, setCoreKitStatus] = createSignal<COREKIT_STATUS>(
   //   COREKIT_STATUS.NOT_INITIALIZED,
@@ -64,9 +77,18 @@ const Home: Component = () => {
   //
   const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
   const [loginRes, setLoginRes] = createSignal<TorusAggregateLoginResponse>();
+  const [provider, setProvider] = createSignal<SolanaPrivateKeyProvider>();
 
   createEffect(() => {
     console.log({ initialised: tkeyInitialised(), loginRes: loginRes() });
+  });
+
+  const rpc = createMemo(() => {
+    const prov = provider();
+    if (!prov) {
+      return;
+    }
+    return new SolanaRpc(prov);
   });
 
   onMount(async () => {
@@ -94,6 +116,12 @@ const Home: Component = () => {
           ),
           "hex",
         );
+        (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.storageHelper.storeLoginDetails(
+          { args: result.args, method: "triggerAggregateLogin" },
+          "",
+        );
 
         setLoginRes(res);
         // Initialization of tKey
@@ -112,6 +140,9 @@ const Home: Component = () => {
         } else {
           await reconstructKey();
         }
+
+        setProvider(privateKeyProvider);
+        // setProvider(tKey.serviceProvider);
       }
     } catch (error) {
       console.error(error);
@@ -129,8 +160,15 @@ const Home: Component = () => {
     try {
       const reconstructedKey = await tKey.reconstructKey();
       console.log({ reconstructedKey });
-      // const privateKey = reconstructedKey?.allKeys.toString('hex');
+      const privKey = reconstructedKey.ed25519Seed;
+      if (!privKey) {
+        console.error("failed to reconstruct allKeys!");
+        return;
+      }
+      const privateKey = privKey.toString("hex");
 
+      await privateKeyProvider.setupProvider(privateKey);
+      // setProvider(privateKeyProvider);
       // await ethereumPrivateKeyProvider.setupProvider(privateKey);
       // setProvider(ethereumPrivateKeyProvider);
       // setLoggedIn(true);
@@ -409,22 +447,122 @@ const Home: Component = () => {
   // 		uiConsole('Input Recovery Share Error:', error);
   // 	}
   // };
-  //
+
   // const setDeviceShare = async () => {
-  // 	try {
-  // 		const generateShareResult = await tKey.generateNewShare();
-  // 		const share = await tKey.outputShareStore(
-  // 			generateShareResult.newShareIndex,
-  // 		);
-  // 		await (
-  // 			tKey.modules.webStorage as WebStorageModule
-  // 		).storeDeviceShare(share);
-  // 		uiConsole('Device Share Set', JSON.stringify(share));
-  // 	} catch (error) {
-  // 		uiConsole('Error', (error as any)?.message.toString(), 'error');
-  // 	}
+  //   try {
+  //     const generateShareResult = await tKey.generateNewShare();
+  //     const share = tKey.outputShareStore(generateShareResult.newShareIndex);
+  //     await (tKey.modules.webStorage as WebStorageModule).storeDeviceShare(
+  //       share,
+  //     );
+  //     uiConsole("Device Share Set", JSON.stringify(share));
+  //   } catch (error) {
+  //     uiConsole("Error", (error as any)?.message.toString(), "error");
+  //   }
+  // };
+
+  const getAccounts = async () => {
+    const prov = provider();
+    if (!prov) {
+      uiConsole("provider not initialized yet");
+      return;
+    }
+    const rpc = new SolanaRpc(prov);
+    const address = await rpc.getAccounts();
+    uiConsole(address);
+  };
+
+  const getBalance = async () => {
+    const _rpc = rpc();
+    if (!_rpc) {
+      uiConsole("provider not initialized yet");
+      return;
+    }
+    const balance = await _rpc.getBalance();
+    uiConsole(balance);
+  };
+
+  // const sendTransaction = async () => {
+  //   const _rpc = rpc();
+  //   if (!_rpc) {
+  //     uiConsole("provider not initialized yet");
+  //     return;
+  //   }
+  //   const receipt = await _rpc.sendTransaction();
+  //   uiConsole(receipt);
   // };
   //
+  // const sendVersionTransaction = async () => {
+  //   const _rpc = rpc();
+  //   if (!_rpc) {
+  //     uiConsole("provider not initialized yet");
+  //     return;
+  //   }
+  //   const receipt = await _rpc.sendVersionTransaction();
+  //   uiConsole(receipt);
+  // };
+  //
+  // const signVersionedTransaction = async () => {
+  //   const _rpc = rpc();
+  //   if (!_rpc) {
+  //     uiConsole("provider not initialized yet");
+  //     return;
+  //   }
+  //   const receipt = await _rpc.signVersionedTransaction();
+  //   uiConsole(receipt);
+  // };
+  //
+  // const signAllVersionedTransaction = async () => {
+  //   const _rpc = rpc();
+  //   if (!_rpc) {
+  //     uiConsole("provider not initialized yet");
+  //     return;
+  //   }
+  //   const receipt = await _rpc.signAllVersionedTransaction();
+  //   uiConsole(receipt);
+  // };
+  //
+  // const signAllTransaction = async () => {
+  //   const _rpc = rpc();
+  //   if (!_rpc) {
+  //     uiConsole("provider not initialized yet");
+  //     return;
+  //   }
+  //   const receipt = await _rpc.signAllTransaction();
+  //   uiConsole(receipt);
+  // };
+  //
+  // // const mintNFT = async () => {
+  // //   if (!provider) {
+  // //     uiConsole("provider not initialized yet");
+  // //     return;
+  // //   }
+  // //   const rpc = new RPC(provider);
+  // //   const NFT = await rpc.mintNFT();
+  // //   uiConsole(NFT);
+  // // };
+  //
+  // const signMessage = async () => {
+  //   const _rpc = rpc();
+  //   if (!_rpc) {
+  //     uiConsole("provider not initialized yet");
+  //     return;
+  //   }
+  //   const signedMessage = await _rpc.signMessage();
+  //   uiConsole(signedMessage);
+  // };
+  //
+  const getPrivateKey = async () => {
+    const _rpc = rpc();
+    if (!_rpc) {
+      uiConsole("provider not initialized yet");
+      return;
+    }
+    const privateKey = await _rpc.getPrivateKey();
+    console.log({ privateKey });
+    uiConsole(privateKey);
+  };
+
   // const getDeviceShare = async () => {
   // 	try {
   // 		const share = await (
@@ -545,16 +683,16 @@ const Home: Component = () => {
   // 		uiConsole(error);
   // 	}
   // };
-  //
-  // const keyDetails = async () => {
-  // 	if (!tKey) {
-  // 		uiConsole("tKey not initialized yet");
-  // 		return;
-  // 	}
-  // 	const keyDetails = await tKey.getKeyDetails();
-  // 	uiConsole(keyDetails);
-  // };
-  //
+
+  const keyDetails = async () => {
+    if (!tKey) {
+      uiConsole("tKey not initialized yet");
+      return;
+    }
+    const keyDetails = tKey.getKeyDetails();
+    uiConsole(keyDetails);
+  };
+
   // const criticalResetAccount = async (): Promise<void> => {
   // 	// This is a critical function that should only be used for testing purposes
   // 	// Resetting your account means clearing all the metadata associated with it from the metadata server
@@ -772,13 +910,13 @@ const Home: Component = () => {
   //   uiConsole(`Hash: https://explorer.solana.com/tx/${hash}?cluster=devnet`);
   // };
   //
-  // const processRequest = (method: () => void) => {
-  //   try {
-  //     method();
-  //   } catch (error) {
-  //     uiConsole(error);
-  //   }
-  // };
+  const processRequest = (method: () => void) => {
+    try {
+      method();
+    } catch (error) {
+      uiConsole(error);
+    }
+  };
   //
   // const signMessage = async () => {
   //   if (!coreKitInstance) {
@@ -834,73 +972,6 @@ const Home: Component = () => {
     console.log(...args);
   }
 
-  // const loggedInView = (
-  //   <>
-  //     <div class="flex-container">
-  //       <div>
-  //         <button onClick={getUserInfo} class="card">
-  //           Get User Info
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={keyDetails} class="card">
-  //           Key Details
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={() => processRequest(enableMFA)} class="card">
-  //           Enabla MFA
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={getAccounts} class="card">
-  //           Get Accounts
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={() => processRequest(requestFaucet)} class="card">
-  //           Request Faucet
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={() => processRequest(getBalance)} class="card">
-  //           Get Balance
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={() => processRequest(signMessage)} class="card">
-  //           Sign Message
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={() => processRequest(sendTransaction)} class="card">
-  //           Send Transaction
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={() => processRequest(logout)} class="card">
-  //           Log Out
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={criticalResetAccount} class="card">
-  //           [CRITICAL] Reset Account
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={exportSeed} class="card">
-  //           [CRITICAL] Export Seed
-  //         </button>
-  //       </div>
-  //       <div>
-  //         <button onClick={exportMnemonicFactor} class="card">
-  //           Generate Backup (Mnemonic)
-  //         </button>
-  //       </div>
-  //     </div>
-  //   </>
-  // );
-  //
   // const unloggedInView = (
   //   <>
   //     <button onClick={loginWithDiscord} class="card">
@@ -932,6 +1003,85 @@ const Home: Component = () => {
       </h1>
 
       <div class="grid">
+        <Show when={provider()}>
+          <>
+            <div class="flex-container">
+              <div>
+                <button onClick={() => {}} class="card">
+                  Get User Info
+                </button>
+              </div>
+              <div>
+                <button onClick={keyDetails} class="card">
+                  Key Details
+                </button>
+              </div>
+              <div>
+                <button onClick={getAccounts} class="card">
+                  Get Accounts
+                </button>
+              </div>
+              <div>
+                <button onClick={() => processRequest(getBalance)} class="card">
+                  Get Balance
+                </button>
+              </div>
+
+              <div>
+                <button
+                  onClick={() => processRequest(getPrivateKey)}
+                  class="card"
+                >
+                  Get Private key
+                </button>
+              </div>
+              {/*
+
+        <div>
+          <button onClick={() => processRequest(enableMFA)} class="card">
+            Enabla MFA
+          </button>
+        </div>
+        <div>
+          <button onClick={() => processRequest(requestFaucet)} class="card">
+            Request Faucet
+          </button>
+        </div>
+        <div>
+          <button onClick={() => processRequest(signMessage)} class="card">
+            Sign Message
+          </button>
+        </div>
+        <div>
+          <button onClick={() => processRequest(sendTransaction)} class="card">
+            Send Transaction
+          </button>
+        </div>
+        <div>
+          <button onClick={() => processRequest(logout)} class="card">
+            Log Out
+          </button>
+        </div>
+        <div>
+          <button onClick={criticalResetAccount} class="card">
+            [CRITICAL] Reset Account
+          </button>
+        </div>
+        <div>
+          <button onClick={exportSeed} class="card">
+            [CRITICAL] Export Seed
+          </button>
+        </div>
+        <div>
+          <button onClick={exportMnemonicFactor} class="card">
+            Generate Backup (Mnemonic)
+          </button>
+        </div>
+
+        */}
+            </div>
+          </>
+        </Show>
         <button onClick={loginWithAuth0Google}>login with google</button>
       </div>
       <div id="console" style={{ "white-space": "pre-line" }}>
