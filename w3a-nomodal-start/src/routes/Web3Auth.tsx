@@ -1,10 +1,14 @@
-import * as web3nomodal from "@web3auth/no-modal";
-const { Web3AuthNoModal } = web3nomodal;
-import * as web3base from "@web3auth/base";
-const { CHAIN_NAMESPACES, WEB3AUTH_NETWORK, UX_MODE, WALLET_ADAPTERS } =
-  web3base;
-import * as web3openlogin from "@web3auth/openlogin-adapter";
-import * as solanaprovider from "@web3auth/solana-provider";
+import { Web3AuthNoModal } from "@web3auth/no-modal";
+import {
+  CHAIN_NAMESPACES,
+  WEB3AUTH_NETWORK,
+  UX_MODE,
+  WALLET_ADAPTERS,
+  IWeb3Auth,
+  IProvider,
+} from "@web3auth/base";
+import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
+import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
 import {
   Show,
   VoidComponent,
@@ -16,15 +20,59 @@ import {
 
 import RPC from "../lib/solana-rpc";
 
+const chainConfig = {
+  chainNamespace: CHAIN_NAMESPACES.SOLANA,
+  chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+  rpcTarget: "https://api.devnet.solana.com",
+  displayName: "Solana Devnet",
+  blockExplorerUrl: "https://explorer.solana.com",
+  ticker: "SOL",
+  tickerName: "Solana Token",
+  logo: "SOL",
+};
+const privateKeyProvider = new SolanaPrivateKeyProvider({
+  config: { chainConfig },
+});
+
+const web3AuthClientId =
+  "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
+
+const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
+const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
+
+const aggregateVerifierIdentifier = "w3a-universal-verifier";
+
+const openloginAdapter = new OpenloginAdapter({
+  privateKeyProvider,
+  adapterSettings: {
+    loginConfig: {
+      google: {
+        name: "Google",
+        typeOfLogin: "jwt",
+        clientId: auth0ClientId,
+        verifier: aggregateVerifierIdentifier,
+        verifierSubIdentifier: "w3a-a0-google",
+        jwtParameters: {
+          connection: "google-oauth2",
+          domain: auth0domainUrl,
+          verifierIdField: "email",
+        },
+      },
+      discord: {
+        name: "Discord",
+        typeOfLogin: "discord",
+        verifier: aggregateVerifierIdentifier,
+        verifierSubIdentifier: "w3a-discord",
+        clientId: "1275709031138463754",
+      },
+    },
+    uxMode: UX_MODE.REDIRECT,
+  },
+});
+
 export const W3Auth: VoidComponent = () => {
-  const clientId =
-    "BPi5PB_UiIZ-cPz1GtV5i1I2iOSOHuimiXBI0e-Oe_u6X3oVAbCiAZOTEBtTXw4tsluTITPqA8zMsfxIKMjiqNQ"; // get from https://dashboard.web3auth.io
-  const [web3auth, setWeb3auth] = createSignal<
-    web3base.IWeb3Auth | undefined
-  >();
-  const [provider, setProvider] = createSignal<
-    web3base.IProvider | undefined
-  >();
+  const [web3auth, setWeb3auth] = createSignal<IWeb3Auth | undefined>();
+  const [provider, setProvider] = createSignal<IProvider | undefined>();
   const [loggedIn, setLoggedIn] = createSignal<boolean>(false);
 
   const rpc = createMemo(() => {
@@ -41,38 +89,17 @@ export const W3Auth: VoidComponent = () => {
   onMount(async () => {
     console.log("on mount!");
     try {
-      const chainConfig = {
-        chainNamespace: CHAIN_NAMESPACES.SOLANA,
-        chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-        rpcTarget: "https://api.devnet.solana.com",
-        displayName: "Solana Devnet",
-        blockExplorerUrl: "https://explorer.solana.com",
-        ticker: "SOL",
-        tickerName: "Solana Token",
-        logo: "",
-      };
       console.log({ chainConfig });
-
-      const privateKeyProvider = new solanaprovider.SolanaPrivateKeyProvider({
-        config: { chainConfig },
-      });
 
       console.log({ privateKeyProvider });
 
       const web3auth = new Web3AuthNoModal({
-        clientId,
+        clientId: web3AuthClientId,
         privateKeyProvider,
-        web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+        web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
       });
 
       setWeb3auth(web3auth);
-
-      const openloginAdapter = new web3openlogin.OpenloginAdapter({
-        privateKeyProvider,
-        adapterSettings: {
-          uxMode: UX_MODE.REDIRECT,
-        },
-      });
       web3auth.configureAdapter(openloginAdapter);
 
       await web3auth.init();
