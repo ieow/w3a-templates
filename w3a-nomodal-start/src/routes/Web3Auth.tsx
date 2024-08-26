@@ -159,7 +159,7 @@ export const W3Auth: VoidComponent = () => {
       return;
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-      loginProvider: "discord",
+      loginProvider: "google",
       // extraLoginOptions: {
       //   redirect_uri: redirectUrl,
       // },
