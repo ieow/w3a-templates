@@ -95,6 +95,13 @@ const Home: Component = () => {
         ).customAuthInstance.getRedirectResult();
         const res = result.result as TorusAggregateLoginResponse;
 
+        console.log({ res });
+
+        if (!("privKey" in res.postboxKeyData)) {
+          console.log("privKey missing!");
+          return;
+        }
+
         tKey.serviceProvider.postboxKey = new BN(
           getPostboxKeyFrom1OutOf1(
             getKeyCurve(KEY_TYPE.ED25519),
