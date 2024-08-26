@@ -26,10 +26,11 @@ const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
-const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
+const googleClientId =
+  "910435925732-8lgkn203rm9j28j7v9kkni41h1pl3t44.apps.googleusercontent.com";
 
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
-const redirectUrl = "https://w3a-nomodal-start.pages.dev";
+// const redirectUrl = "https://w3a-nomodal-start.pages.dev";
 
 export const W3Auth: VoidComponent = () => {
   const [web3auth, setWeb3auth] = createSignal<IWeb3Auth | undefined>();
@@ -90,16 +91,16 @@ export const W3Auth: VoidComponent = () => {
         adapterSettings: {
           network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           uxMode: UX_MODE.REDIRECT,
-          redirectUrl,
+          // redirectUrl,
           loginConfig: {
             google: {
               name: "Google",
               typeOfLogin: "jwt",
-              clientId: auth0ClientId,
+              clientId: googleClientId,
               verifier: aggregateVerifierIdentifier,
               verifierSubIdentifier: "w3a-a0-google",
               jwtParameters: {
-                redirect_uri: redirectUrl,
+                // redirect_uri: redirectUrl,
                 connection: "google-oauth2",
                 domain: auth0domainUrl,
                 verifierIdField: "email",
@@ -159,9 +160,9 @@ export const W3Auth: VoidComponent = () => {
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "discord",
-      extraLoginOptions: {
-        redirect_uri: redirectUrl,
-      },
+      // extraLoginOptions: {
+      //   redirect_uri: redirectUrl,
+      // },
       // extraLoginOptions: {
       //   domain: auth0domainUrl,
       //   // this corresponds to the field inside jwt which must be used to uniquely
