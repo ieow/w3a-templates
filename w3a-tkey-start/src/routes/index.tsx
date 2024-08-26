@@ -149,6 +149,18 @@ const Home: Component = () => {
           ).then((r) => r.json());
           console.log("revoke res: ", { revokeRes });
 
+          (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
+          (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
+            result.hashParameters?.scope ?? "local_scope",
+          );
+
+          (
+            tKey.serviceProvider as TorusServiceProvider
+          ).customAuthInstance.storageHelper.init();
           result = await (
             tKey.serviceProvider as TorusServiceProvider
           ).customAuthInstance.getRedirectResult({
