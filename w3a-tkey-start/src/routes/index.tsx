@@ -156,6 +156,8 @@ const Home: Component = () => {
           });
         }
 
+        console.log({ new_result: result });
+
         const res = result.result as TorusAggregateLoginResponse;
         tKey.serviceProvider.postboxKey = new BN(
           getPostboxKeyFrom1OutOf1(
