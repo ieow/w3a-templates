@@ -158,9 +158,15 @@ const Home: Component = () => {
             result.hashParameters?.scope ?? "local_scope",
           );
 
+          await (tKey.serviceProvider as TorusServiceProvider).init({
+            skipSw: true,
+            skipPrefetch: true,
+          });
+
           (
             tKey.serviceProvider as TorusServiceProvider
           ).customAuthInstance.storageHelper.init();
+
           result = await (
             tKey.serviceProvider as TorusServiceProvider
           ).customAuthInstance.getRedirectResult({
