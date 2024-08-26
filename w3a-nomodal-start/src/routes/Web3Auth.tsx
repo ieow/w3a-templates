@@ -159,6 +159,9 @@ export const W3Auth: VoidComponent = () => {
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "discord",
+      extraLoginOptions: {
+        redirect_uri: redirectUrl,
+      },
       // extraLoginOptions: {
       //   domain: auth0domainUrl,
       //   // this corresponds to the field inside jwt which must be used to uniquely
