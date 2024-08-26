@@ -1,15 +1,19 @@
 import { Component, onMount } from "solid-js";
-import { TKeyDefault } from "@tkey/default";
+import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
 import { SecurityQuestionsModule } from "@tkey/security-questions";
 import { TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
+import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
 const securityQuestionsModule = new SecurityQuestionsModule();
+const storageLayer = new TorusStorageLayer({
+  hostUrl: "https://metadata.tor.us",
+});
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
@@ -28,13 +32,14 @@ const serviceProvider = new TorusServiceProvider({
 });
 
 // Instantiation of tKey
-const tKey = new TKeyDefault({
+const tKey = new TKey({
   modules: {
     webStorage: webStorageModule,
     securityQuestions: securityQuestionsModule,
   },
   manualSync: true,
   serviceProvider,
+  storageLayer,
 });
 
 // const coreKitInstance = new Web3AuthMPCCoreKit({

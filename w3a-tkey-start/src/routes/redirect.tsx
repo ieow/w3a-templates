@@ -1,20 +1,22 @@
 import { createSignal, onMount } from "solid-js";
-import { A, useNavigate } from "@solidjs/router";
+import { A } from "@solidjs/router";
 
-import { TKeyDefault } from "@tkey/default";
+import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage";
 import { SecurityQuestionsModule } from "@tkey/security-questions";
 import { TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
-import { BN } from "bn.js";
-import { TorusLoginResponse } from "@toruslabs/customauth";
-import TorusUtils from "@toruslabs/torus.js";
+import { TorusAggregateLoginResponse } from "@toruslabs/customauth";
+import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
 const securityQuestionsModule = new SecurityQuestionsModule();
+const storageLayer = new TorusStorageLayer({
+  hostUrl: "https://metadata.tor.us",
+});
 
 // const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 // const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
@@ -33,13 +35,14 @@ const serviceProvider = new TorusServiceProvider({
 });
 
 // Instantiation of tKey
-const tKey = new TKeyDefault({
+const tKey = new TKey({
   modules: {
     webStorage: webStorageModule,
     securityQuestions: securityQuestionsModule,
   },
   manualSync: true,
   serviceProvider,
+  storageLayer,
 });
 
 export default function Redirect() {
@@ -50,7 +53,7 @@ export default function Redirect() {
   // const [mnemonicFactor, setMnemonicFactor] = createSignal<string>("");
 
   const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
-  const [userInfo, setUserInfo] = createSignal<any>();
+  const [loginRes, setLoginRes] = createSignal<TorusAggregateLoginResponse>();
 
   // decide whether to rehydrate session
   // const rehydrate = true;
@@ -74,13 +77,14 @@ export default function Redirect() {
         //   TorusUtils.getPostboxKey(result.result as TorusLoginResponse),
         //   "hex",
         // );
-        setUserInfo((result.result as any).userInfo);
+        setLoginRes(result.result as TorusAggregateLoginResponse);
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
 
         setTKeyInitialised(true);
 
-        var { requiredShares } = tKey.getKeyDetails();
+        const { requiredShares } = tKey.getKeyDetails();
+        console.log({ requiredShares });
 
         if (requiredShares > 0) {
           uiConsole(
@@ -94,30 +98,6 @@ export default function Redirect() {
     } catch (error) {
       console.error(error);
     }
-    // // Example config to handle redirect result manually
-    // await coreKitInstance.init({ handleRedirectResult: false, rehydrate });
-    // if (
-    //   window.location.hash.includes("#token_type") ||
-    //   window.location.hash.includes("#access_token")
-    // ) {
-    //   console.log("handling redirect result!");
-    //   await coreKitInstance.handleRedirectResult();
-    // }
-    //
-    // if (coreKitInstance.status === COREKIT_STATUS.LOGGED_IN) {
-    //   console.log("logged in!!!");
-    //   // await setupProvider();
-    // }
-    //
-    // if (coreKitInstance.status === COREKIT_STATUS.REQUIRED_SHARE) {
-    //   uiConsole(
-    //     "required more shares, please enter your backup/ device factor key, or reset account unrecoverable once reset, please use it with caution]",
-    //   );
-    // }
-    //
-    // console.log("coreKitInstance.status", coreKitInstance.status);
-    // setCoreKitStatus(coreKitInstance.status);
-    //
     // // try {
     // //   let result = securityQuestion.getQuestion(coreKitInstance!);
     // //   setQuestion(result);
