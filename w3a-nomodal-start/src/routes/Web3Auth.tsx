@@ -135,7 +135,6 @@ export const W3Auth: VoidComponent = () => {
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "google",
-      redirectUrl,
     });
     console.log({ web3authProvider });
     setProvider(web3authProvider ?? undefined);
