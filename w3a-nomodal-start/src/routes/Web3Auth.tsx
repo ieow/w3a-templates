@@ -96,7 +96,7 @@ export const W3Auth: VoidComponent = () => {
       const web3auth = new Web3AuthNoModal({
         clientId: web3AuthClientId,
         privateKeyProvider,
-        web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
+        web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
       });
 
       setWeb3auth(web3auth);
