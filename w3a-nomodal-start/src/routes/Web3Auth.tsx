@@ -25,8 +25,6 @@ import RPC from "../lib/solana-rpc";
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 
-const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
-
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
 // const redirectUrl = "https://w3a-nomodal-start.pages.dev";
 
@@ -89,8 +87,8 @@ export const W3Auth: VoidComponent = () => {
         adapterSettings: {
           network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
           uxMode: UX_MODE.POPUP,
-          redirectUrl:
-            "https://dev-n82s5hbtzoxieejz.us.auth0.com/login/callback",
+          // redirectUrl:
+          //   "https://dev-n82s5hbtzoxieejz.us.auth0.com/login/callback",
           // redirectUrl,
           loginConfig: {
             google: {
@@ -154,16 +152,16 @@ export const W3Auth: VoidComponent = () => {
     }
     const web3authProvider = await auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
       loginProvider: "google",
-      extraLoginOptions: {
-        redirect_uri:
-          "https://dev-n82s5hbtzoxieejz.us.auth0.com/login/callback",
-        domain: auth0domainUrl,
-        // this corresponds to the field inside jwt which must be used to uniquely
-        // identify the user. This is mapped b/w google and github logins
-        verifierIdField: "email",
-        isVerifierIdCaseSensitive: false,
-        connection: "google-oauth2",
-      },
+      // extraLoginOptions: {
+      //   redirect_uri:
+      //     "https://dev-n82s5hbtzoxieejz.us.auth0.com/login/callback",
+      //   domain: auth0domainUrl,
+      //   // this corresponds to the field inside jwt which must be used to uniquely
+      //   // identify the user. This is mapped b/w google and github logins
+      //   verifierIdField: "email",
+      //   isVerifierIdCaseSensitive: false,
+      //   connection: "google-oauth2",
+      // },
     });
     console.log({ web3authProvider });
     setProvider(web3authProvider ?? undefined);
