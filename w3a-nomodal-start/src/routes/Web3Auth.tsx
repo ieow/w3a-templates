@@ -106,6 +106,7 @@ export const W3Auth: VoidComponent = () => {
 
       await web3auth.init();
       setProvider(web3auth.provider ?? undefined);
+      console.log("connected: ", { connected: web3auth.connected });
       if (web3auth.connected) {
         setLoggedIn(true);
       }
