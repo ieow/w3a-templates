@@ -348,6 +348,32 @@ const Home: Component = () => {
   //   }
   // };
 
+  const loginWithDiscord = async () => {
+    if (!tKey) {
+      uiConsole("tKey not initialized yet");
+      return;
+    }
+    try {
+      console.log("logging in with google!");
+      // Triggering Login using Service Provider ==> opens the popup
+      await (
+        tKey.serviceProvider as TorusServiceProvider
+      ).triggerAggregateLogin({
+        aggregateVerifierType: "single_id_verifier",
+        verifierIdentifier: aggregateVerifierIdentifier,
+        subVerifierDetailsArray: [
+          {
+            typeOfLogin: "discord",
+            verifier: "w3a-discord",
+            clientId: "1275709031138463754",
+          },
+        ],
+      });
+    } catch (error) {
+      uiConsole(error, "caught");
+    }
+  };
+
   const loginWithAuth0Google = async () => {
     if (!tKey) {
       uiConsole("tKey not initialized yet");
@@ -1083,6 +1109,7 @@ const Home: Component = () => {
           </>
         </Show>
         <button onClick={loginWithAuth0Google}>login with google</button>
+        <button onClick={loginWithDiscord}>login with discord</button>
       </div>
       <div id="console" style={{ "white-space": "pre-line" }}>
         <p style={{ "white-space": "pre-line" }}></p>
