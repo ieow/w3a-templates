@@ -67,7 +67,8 @@ export default function Redirect() {
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
         window.location.hash.includes("#state") ||
-        window.location.hash.includes("#access_token")
+        window.location.hash.includes("#access_token") ||
+        window.location.hash.includes("#token_type")
       ) {
         let result = await (
           tKey.serviceProvider as TorusServiceProvider
