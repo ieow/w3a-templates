@@ -5,6 +5,7 @@ export async function revokeDiscordToken(token: string) {
   const formData = new FormData();
   formData.append("token", token);
   const res = await fetch("https://discord.com/api/oauth2/token/revoke", {
+    method: "POST",
     headers: {
       // ...formData,
       Authorization: `Basic ${Buffer.from(`${DISCORD_CLIENT_ID}:${DISCORD_CLIENT_SECRET}`, "binary").toString("base64")}`,
