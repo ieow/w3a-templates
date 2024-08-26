@@ -80,9 +80,17 @@ export const W3Auth: VoidComponent = () => {
         config: { chainConfig },
       });
 
+      const web3auth = new Web3AuthNoModal({
+        clientId: web3AuthClientId,
+        privateKeyProvider,
+        web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
+      });
       const openloginAdapter = new OpenloginAdapter({
         privateKeyProvider,
         adapterSettings: {
+          network: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
+          uxMode: UX_MODE.REDIRECT,
+          redirectUrl,
           loginConfig: {
             google: {
               name: "Google",
@@ -105,15 +113,7 @@ export const W3Auth: VoidComponent = () => {
               clientId: "1275709031138463754",
             },
           },
-          uxMode: UX_MODE.REDIRECT,
-          redirectUrl,
         },
-      });
-
-      const web3auth = new Web3AuthNoModal({
-        clientId: web3AuthClientId,
-        privateKeyProvider,
-        web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET,
       });
 
       web3auth.configureAdapter(openloginAdapter);
@@ -134,6 +134,7 @@ export const W3Auth: VoidComponent = () => {
       await web3auth.init();
 
       setWeb3auth(web3auth);
+      await login();
 
       console.log("connected: ", { connected: web3auth.connected });
     } catch (error) {
