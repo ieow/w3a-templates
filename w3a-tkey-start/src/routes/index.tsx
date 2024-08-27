@@ -176,6 +176,8 @@ const Home: Component = () => {
         console.log({ new_result: result });
 
         const res = result.result as TorusAggregateLoginResponse;
+        const sessionId = SessionManager.generateRandomSessionKey();
+
         tKey.serviceProvider.postboxKey = new BN(
           getPostboxKeyFrom1OutOf1(
             getKeyCurve(KEY_TYPE.ED25519),
@@ -188,10 +190,9 @@ const Home: Component = () => {
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.storeLoginDetails(
           { args: result.args, method: "triggerAggregateLogin" },
-          result.hashParameters?.scope ?? "local_scope",
+          sessionId,
         );
 
-        const sessionId = SessionManager.generateRandomSessionKey();
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON(); // any json data you want to store in the session
         await sessionManagerInstance.createSession(data);
@@ -200,6 +201,9 @@ const Home: Component = () => {
 
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
+
+        console.log("tKey.initialize: ", { session_data: data });
+        localStorage.setItem("session_id", sessionId);
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
@@ -211,6 +215,8 @@ const Home: Component = () => {
           );
         } else {
           await reconstructKey();
+          console.log("reconstructKey: ", { session_data: data });
+          localStorage.setItem("session_id", sessionId);
         }
 
         batch(() => {
