@@ -6,13 +6,13 @@ import {
   createSignal,
   onMount,
 } from "solid-js";
-import { TKey } from "@tkey/core/dist/core.esm";
+import { TKey } from "@tkey/core";
 import { WebStorageModule } from "@tkey/web-storage/dist/webStorage.esm";
 import {
   KEY_TYPE,
   TORUS_SAPPHIRE_NETWORK,
 } from "@toruslabs/constants/dist/constants.esm";
-import { TorusServiceProvider } from "@tkey/service-provider-torus/dist/serviceProviderTorus.esm";
+import { TorusServiceProvider } from "@tkey/service-provider-torus";
 import {
   TorusAggregateLoginResponse,
   TorusVerifierResponse,
@@ -92,6 +92,12 @@ const Home: Component = () => {
         const data = await sessionManagerInstance.authorizeSession();
         console.log({ data });
         tKey = data;
+
+        console.log("initializing customAuthInstance!");
+        await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.init({ skipSw: true, skipPrefetch: true });
+        console.log("initialized customAuthInstance!", { tKey });
 
         const userDetails = await (
           tKey.serviceProvider as TorusServiceProvider
