@@ -87,7 +87,15 @@ const Home: Component = () => {
         const data = await sessionManagerInstance.authorizeSession();
         console.log({ data });
         tKey = data;
+        const newServiceProvider = new TorusServiceProvider({
+          enableLogging: tKey.serviceProvider.enableLogging,
+          postboxKey: tKey.serviceProvider.postboxKey.toString("hex"),
+          customAuthArgs: (tKey.serviceProvider as TorusServiceProvider)
+            .customAuthArgs,
+        });
+        tKey.serviceProvider = newServiceProvider;
       }
+
       await (tKey.serviceProvider as TorusServiceProvider).init({
         skipSw: true,
         skipPrefetch: true,
@@ -119,21 +127,6 @@ const Home: Component = () => {
             result.hashParameters?.scope ?? "local_scope",
           );
           console.log({ loginDetails });
-
-          // if (loginDetails) {
-          //   return;
-          // }
-
-          // (
-          //   tKey.serviceProvider as TorusServiceProvider
-          // ).customAuthInstance.storageHelper.clearOrphanedLoginDetails();
-          // console.log("cleared orphaned login details!");
-          //
-          // (
-          //   tKey.serviceProvider as TorusServiceProvider
-          // ).customAuthInstance.storageHelper.clearLoginDetailsStorage(
-          //   result.hashParameters?.scope ?? "local_scope",
-          // );
 
           // console.log("cleared login details of scope!");
           if (!("hashParameters" in result) || !result.hashParameters) {
