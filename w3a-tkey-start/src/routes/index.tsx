@@ -177,6 +177,7 @@ const Home: Component = () => {
 
         const res = result.result as TorusAggregateLoginResponse;
         const sessionId = SessionManager.generateRandomSessionKey();
+        localStorage.setItem("session_id", sessionId);
 
         tKey.serviceProvider.postboxKey = new BN(
           getPostboxKeyFrom1OutOf1(
@@ -193,18 +194,8 @@ const Home: Component = () => {
           sessionId,
         );
 
-        const sessionManagerInstance = new SessionManager({ sessionId });
-        let data = tKey.toJSON(); // any json data you want to store in the session
-        await sessionManagerInstance.createSession(data);
-        console.log({ session_data: data });
-        localStorage.setItem("session_id", sessionId);
-
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
-
-        data = tKey.toJSON(); // any json data you want to store in the session
-        console.log("tKey.initialize: ", { session_data: data });
-        localStorage.setItem("session_id", sessionId);
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
@@ -216,9 +207,10 @@ const Home: Component = () => {
           );
         } else {
           await reconstructKey();
-          data = tKey.toJSON(); // any json data you want to store in the session
+          const sessionManagerInstance = new SessionManager({ sessionId });
+          const data = tKey.toJSON();
+          await sessionManagerInstance.createSession(data);
           console.log("reconstructKey: ", { session_data: data });
-          localStorage.setItem("session_id", sessionId);
         }
 
         batch(() => {
