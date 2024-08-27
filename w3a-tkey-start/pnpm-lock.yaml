@@ -26,13 +26,7 @@ importers:
       '@tkey/default':
         specifier: ^15.0.2
         version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@tkey/security-questions':
-        specifier: ^15.0.2
-        version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@tkey/service-provider-torus':
-        specifier: ^15.0.2
-        version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
-      '@tkey/storage-layer-torus':
         specifier: ^15.0.2
         version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@tkey/web-storage':
@@ -47,6 +41,9 @@ importers:
       '@toruslabs/openlogin-ed25519':
         specifier: ^8.1.0
         version: 8.1.0(@babel/runtime@7.25.0)
+      '@toruslabs/session-manager':
+        specifier: ^2.0.0
+        version: 2.0.0(@babel/runtime@7.25.0)
       '@toruslabs/torus.js':
         specifier: ^15.0.2
         version: 15.0.2(@babel/runtime@7.25.0)

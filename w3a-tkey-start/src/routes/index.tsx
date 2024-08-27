@@ -3,36 +3,39 @@ import {
   Show,
   batch,
   createEffect,
-  createMemo,
   createSignal,
   onMount,
 } from "solid-js";
-import { TKey } from "@tkey/core";
-import { WebStorageModule } from "@tkey/web-storage";
-import { SecurityQuestionsModule } from "@tkey/security-questions";
-import { KEY_TYPE, TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
-import { TorusServiceProvider } from "@tkey/service-provider-torus";
+import { TKey } from "@tkey/core/dist/core.esm";
+import { WebStorageModule } from "@tkey/web-storage/dist/webStorage.esm";
+import {
+  KEY_TYPE,
+  TORUS_SAPPHIRE_NETWORK,
+} from "@toruslabs/constants/dist/constants.esm";
+import { TorusServiceProvider } from "@tkey/service-provider-torus/dist/serviceProviderTorus.esm";
 import {
   TorusAggregateLoginResponse,
   TorusVerifierResponse,
-} from "@toruslabs/customauth";
-import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
+} from "@toruslabs/customauth/dist/customauth.esm";
+import {
+  getKeyCurve,
+  getPostboxKeyFrom1OutOf1,
+} from "@toruslabs/torus.js/dist/torusUtils.esm";
 import { BN } from "bn.js";
-import { TorusStorageLayer } from "@tkey/storage-layer-torus";
-import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
-import { getED25519Key } from "@toruslabs/openlogin-ed25519";
+// import { TorusStorageLayer } from "@tkey/storage-layer-torus";
+// import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
+import { SessionManager } from "@toruslabs/session-manager/dist/sessionManager.esm";
+import { getED25519Key } from "@toruslabs/openlogin-ed25519/dist/openloginEd25519.esm";
 
-import { revokeDiscordToken } from "./revoke";
-import SolanaRpc from "./rpc";
+// import SolanaRpc from "./rpc";
 
 const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
-const securityQuestionsModule = new SecurityQuestionsModule();
-const storageLayer = new TorusStorageLayer({
-  hostUrl: "https://metadata.tor.us",
-});
+// const storageLayer = new TorusStorageLayer({
+//   hostUrl: "https://metadata.tor.us",
+// });
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
@@ -52,14 +55,13 @@ const serviceProvider = new TorusServiceProvider({
 });
 
 // Instantiation of tKey
-const tKey = new TKey({
+let tKey = new TKey({
   modules: {
     webStorage: webStorageModule,
-    securityQuestions: securityQuestionsModule,
   },
   manualSync: true,
   serviceProvider,
-  storageLayer,
+  // storageLayer,
 });
 
 const Home: Component = () => {
@@ -69,19 +71,11 @@ const Home: Component = () => {
   //
   const [tkeyInitialised, setTKeyInitialised] = createSignal(false);
   const [loginRes, setLoginRes] = createSignal<TorusAggregateLoginResponse>();
-  const [provider, setProvider] = createSignal<SolanaPrivateKeyProvider>();
+  // const [provider, setProvider] = createSignal<SolanaPrivateKeyProvider>();
   const [userInfo, setUserInfo] = createSignal<TorusVerifierResponse>();
 
   createEffect(() => {
     console.log({ initialised: tkeyInitialised(), loginRes: loginRes() });
-  });
-
-  const rpc = createMemo(() => {
-    const prov = provider();
-    if (!prov) {
-      return;
-    }
-    return new SolanaRpc(prov);
   });
 
   onMount(async () => {
@@ -90,6 +84,20 @@ const Home: Component = () => {
         skipSw: true,
         skipPrefetch: true,
       });
+
+      const sessionId = localStorage.getItem("session_id");
+      if (sessionId) {
+        const sessionManagerInstance = new SessionManager({ sessionId });
+        const data = await sessionManagerInstance.authorizeSession();
+        tKey = JSON.parse(data) as TKey;
+
+        const userDetails = await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.storageHelper.retrieveLoginDetails("local_scope");
+
+        console.log({ userDetails });
+        return;
+      }
 
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
@@ -201,23 +209,14 @@ const Home: Component = () => {
           setLoginRes(res);
           setUserInfo(res.userInfo[0]);
         });
+
+        const sessionId = SessionManager.generateRandomSessionKey();
+        const sessionManagerInstance = new SessionManager({ sessionId });
+        const data = tKey.toJSON(); // any json data you want to store in the session
+        await sessionManagerInstance.createSession(data);
       }
     } catch (error) {
       console.error(error);
-      if (
-        error instanceof Error &&
-        error.message.includes("Duplicate token found")
-      ) {
-        const loginDetails = await (
-          tKey.serviceProvider as TorusServiceProvider
-        ).customAuthInstance.storageHelper.retrieveLoginDetails(
-          "",
-          // result.hashParameters?.scope ?? "local_scope",
-        );
-
-        console.log({ loginDetails });
-        return;
-      }
     }
     // // try {
     // //   let result = securityQuestion.getQuestion(coreKitInstance!);
@@ -242,24 +241,26 @@ const Home: Component = () => {
         reconstructedKey.secp256k1Key.toString("hex"),
       ).sk.toString("hex");
 
-      const privateKeyProvider = new SolanaPrivateKeyProvider({
-        config: {
-          chainConfig: {
-            chainNamespace: "solana",
-            chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-            rpcTarget: "https://api.devnet.solana.com",
-            displayName: "Solana Devnet",
-            blockExplorerUrl: "https://explorer.solana.com",
-            ticker: "SOL",
-            tickerName: "Solana Token",
-            logo: "",
-          },
-        },
-      });
+      console.log({ ed25519key });
 
-      await privateKeyProvider.setupProvider(ed25519key);
-      console.log({ privateKeyProvider });
-      setProvider(privateKeyProvider);
+      // const privateKeyProvider = new SolanaPrivateKeyProvider({
+      //   config: {
+      //     chainConfig: {
+      //       chainNamespace: "solana",
+      //       chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
+      //       rpcTarget: "https://api.devnet.solana.com",
+      //       displayName: "Solana Devnet",
+      //       blockExplorerUrl: "https://explorer.solana.com",
+      //       ticker: "SOL",
+      //       tickerName: "Solana Token",
+      //       logo: "",
+      //     },
+      //   },
+      // });
+      //
+      // await privateKeyProvider.setupProvider(ed25519key);
+      // console.log({ privateKeyProvider });
+      // setProvider(privateKeyProvider);
       // setLoggedIn(true);
       // setDeviceShare();
     } catch (e) {
@@ -577,24 +578,24 @@ const Home: Component = () => {
   // };
 
   const getAccounts = async () => {
-    const prov = provider();
-    if (!prov) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const rpc = new SolanaRpc(prov);
-    const address = await rpc.getAccounts();
-    uiConsole(address);
+    //   const prov = provider();
+    //   if (!prov) {
+    //     uiConsole("provider not initialized yet");
+    //     return;
+    //   }
+    //   const rpc = new SolanaRpc(prov);
+    //   const address = await rpc.getAccounts();
+    //   uiConsole(address);
   };
-
+  //
   const getBalance = async () => {
-    const _rpc = rpc();
-    if (!_rpc) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const balance = await _rpc.getBalance();
-    uiConsole(balance);
+    //   const _rpc = rpc();
+    //   if (!_rpc) {
+    //     uiConsole("provider not initialized yet");
+    //     return;
+    //   }
+    //   const balance = await _rpc.getBalance();
+    //   uiConsole(balance);
   };
 
   // const sendTransaction = async () => {
@@ -668,14 +669,14 @@ const Home: Component = () => {
   // };
   //
   const getPrivateKey = async () => {
-    const _rpc = rpc();
-    if (!_rpc) {
-      uiConsole("provider not initialized yet");
-      return;
-    }
-    const privateKey = await _rpc.getPrivateKey();
-    console.log({ privateKey });
-    uiConsole(privateKey);
+    //   const _rpc = rpc();
+    //   if (!_rpc) {
+    //     uiConsole("provider not initialized yet");
+    //     return;
+    //   }
+    //   const privateKey = await _rpc.getPrivateKey();
+    //   console.log({ privateKey });
+    //   uiConsole(privateKey);
   };
 
   // const getDeviceShare = async () => {

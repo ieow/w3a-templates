@@ -1,5 +1,5 @@
 # https://developers.cloudflare.com/pages/functions/wrangler-configuration
-name = "w3a-mpc-start"
+name = "w3a-tkey-start"
 pages_build_output_dir = "dist"
 compatibility_date = "2024-07-24"
 compatibility_flags = ["nodejs_compat"]
