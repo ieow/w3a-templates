@@ -214,6 +214,8 @@ const Home: Component = () => {
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON(); // any json data you want to store in the session
         await sessionManagerInstance.createSession(data);
+        console.log({ session_data: data });
+        localStorage.setItem("session_id", sessionId);
       }
     } catch (error) {
       console.error(error);
