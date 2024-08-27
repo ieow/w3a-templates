@@ -101,6 +101,13 @@ const Home: Component = () => {
         skipPrefetch: true,
       });
 
+      if (sessionId) {
+        const loginDetails = await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
+        console.log({ loginDetails });
+      }
+
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
         window.location.hash.includes("#state") ||
