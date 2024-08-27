@@ -27,6 +27,7 @@ import { TorusStorageLayer } from "@tkey/storage-layer-torus/dist/storageLayerTo
 import { SessionManager } from "@toruslabs/session-manager/dist/sessionManager.esm";
 import { getED25519Key } from "@toruslabs/openlogin-ed25519/dist/openloginEd25519.esm";
 import { revokeDiscordToken } from "./revoke";
+import { AggregateLoginParams } from "@toruslabs/customauth";
 
 // import SolanaRpc from "./rpc";
 
@@ -106,6 +107,12 @@ const Home: Component = () => {
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
         console.log({ loginDetails });
+
+        const res = await (
+          tKey.serviceProvider as TorusServiceProvider
+        ).triggerAggregateLogin(loginDetails.args as AggregateLoginParams);
+
+        console.log("existing session user info: ", { res });
       }
 
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
