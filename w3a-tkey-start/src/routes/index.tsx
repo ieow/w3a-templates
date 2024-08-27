@@ -81,31 +81,17 @@ const Home: Component = () => {
 
   onMount(async () => {
     try {
-      await (tKey.serviceProvider as TorusServiceProvider).init({
-        skipSw: true,
-        skipPrefetch: true,
-      });
-
       const sessionId = localStorage.getItem("session_id");
       if (sessionId) {
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = await sessionManagerInstance.authorizeSession();
         console.log({ data });
         tKey = data;
-
-        console.log("initializing customAuthInstance!");
-        await (
-          tKey.serviceProvider as TorusServiceProvider
-        ).customAuthInstance.init({ skipSw: true, skipPrefetch: true });
-        console.log("initialized customAuthInstance!", { tKey });
-
-        const userDetails = await (
-          tKey.serviceProvider as TorusServiceProvider
-        ).customAuthInstance.storageHelper.retrieveLoginDetails("local_scope");
-
-        console.log({ userDetails });
-        return;
       }
+      await (tKey.serviceProvider as TorusServiceProvider).init({
+        skipSw: true,
+        skipPrefetch: true,
+      });
 
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
