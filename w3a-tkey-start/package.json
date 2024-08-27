@@ -16,6 +16,7 @@
     "@tkey/core": "^15.0.2",
     "@tkey/default": "^15.0.2",
     "@tkey/service-provider-torus": "^15.0.2",
+    "@tkey/storage-layer-torus": "^15.0.2",
     "@tkey/web-storage": "^15.0.2",
     "@toruslabs/constants": "^14.0.0",
     "@toruslabs/customauth": "^20.1.1",

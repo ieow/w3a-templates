@@ -29,6 +29,9 @@ importers:
       '@tkey/service-provider-torus':
         specifier: ^15.0.2
         version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+      '@tkey/storage-layer-torus':
+        specifier: ^15.0.2
+        version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@tkey/web-storage':
         specifier: ^15.0.2
         version: 15.0.2(@babel/runtime@7.25.0)(bufferutil@4.0.8)(utf-8-validate@5.0.10)

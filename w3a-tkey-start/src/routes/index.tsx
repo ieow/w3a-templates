@@ -22,7 +22,7 @@ import {
   getPostboxKeyFrom1OutOf1,
 } from "@toruslabs/torus.js/dist/torusUtils.esm";
 import { BN } from "bn.js";
-// import { TorusStorageLayer } from "@tkey/storage-layer-torus";
+import { TorusStorageLayer } from "@tkey/storage-layer-torus/dist/storageLayerTorus.esm";
 // import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
 import { SessionManager } from "@toruslabs/session-manager/dist/sessionManager.esm";
 import { getED25519Key } from "@toruslabs/openlogin-ed25519/dist/openloginEd25519.esm";
@@ -34,9 +34,9 @@ const web3AuthClientId =
   "BNBNpzCHEqOG-LIYygpzo7wsN8PDLjPjoh6GnuAwJth_prYW-pdy2O7kqE0C5lrGCnlJfCZx4_OEItGTcti6q1A"; // get from https://dashboard.web3auth.io
 // Configuration of Modules
 const webStorageModule = new WebStorageModule();
-// const storageLayer = new TorusStorageLayer({
-//   hostUrl: "https://metadata.tor.us",
-// });
+const storageLayer = new TorusStorageLayer({
+  hostUrl: "https://metadata.tor.us",
+});
 
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
@@ -62,7 +62,7 @@ let tKey = new TKey({
   },
   manualSync: true,
   serviceProvider,
-  // storageLayer,
+  storageLayer,
 });
 
 const Home: Component = () => {
