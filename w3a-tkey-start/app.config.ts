@@ -16,6 +16,19 @@ export default defineConfig({
         target: "esnext",
       },
     },
+    rollupConfig: {
+      output: {
+        manualChunks: (id) => {
+          if (
+            // walletconnect
+            id.includes("@toruslabs") ||
+            id.includes("@tkey")
+          ) {
+            return "auth-vendor";
+          }
+        },
+      },
+    },
   },
   vite: {
     define: {

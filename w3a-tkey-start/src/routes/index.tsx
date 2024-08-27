@@ -7,25 +7,19 @@ import {
   onMount,
 } from "solid-js";
 import { TKey } from "@tkey/core";
-import { WebStorageModule } from "@tkey/web-storage/dist/webStorage.esm";
-import {
-  KEY_TYPE,
-  TORUS_SAPPHIRE_NETWORK,
-} from "@toruslabs/constants/dist/constants.esm";
+import { WebStorageModule } from "@tkey/web-storage";
+import { KEY_TYPE, TORUS_SAPPHIRE_NETWORK } from "@toruslabs/constants";
 import { TorusServiceProvider } from "@tkey/service-provider-torus";
 import {
   TorusAggregateLoginResponse,
   TorusVerifierResponse,
-} from "@toruslabs/customauth/dist/customauth.esm";
-import {
-  getKeyCurve,
-  getPostboxKeyFrom1OutOf1,
-} from "@toruslabs/torus.js/dist/torusUtils.esm";
+} from "@toruslabs/customauth";
+import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
 import { BN } from "bn.js";
-import { TorusStorageLayer } from "@tkey/storage-layer-torus/dist/storageLayerTorus.esm";
+import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 // import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
-import { SessionManager } from "@toruslabs/session-manager/dist/sessionManager.esm";
-import { getED25519Key } from "@toruslabs/openlogin-ed25519/dist/openloginEd25519.esm";
+import { SessionManager } from "@toruslabs/session-manager";
+import { getED25519Key } from "@toruslabs/openlogin-ed25519";
 import { revokeDiscordToken } from "./revoke";
 import { AggregateLoginParams } from "@toruslabs/customauth";
 
@@ -113,6 +107,8 @@ const Home: Component = () => {
           idToken: s.clientId,
           verifier: s.verifier,
         }));
+
+        await reconstructKey();
         console.log({ aggregateVerifierIdentifier, subInfos });
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
