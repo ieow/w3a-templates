@@ -190,6 +190,13 @@ const Home: Component = () => {
           result.hashParameters?.scope ?? "local_scope",
         );
 
+        const sessionId = SessionManager.generateRandomSessionKey();
+        const sessionManagerInstance = new SessionManager({ sessionId });
+        const data = tKey.toJSON(); // any json data you want to store in the session
+        await sessionManagerInstance.createSession(data);
+        console.log({ session_data: data });
+        localStorage.setItem("session_id", sessionId);
+
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
 
@@ -210,13 +217,6 @@ const Home: Component = () => {
           setLoginRes(res);
           setUserInfo(res.userInfo[0]);
         });
-
-        const sessionId = SessionManager.generateRandomSessionKey();
-        const sessionManagerInstance = new SessionManager({ sessionId });
-        const data = tKey.toJSON(); // any json data you want to store in the session
-        await sessionManagerInstance.createSession(data);
-        console.log({ session_data: data });
-        localStorage.setItem("session_id", sessionId);
       }
     } catch (error) {
       console.error(error);
