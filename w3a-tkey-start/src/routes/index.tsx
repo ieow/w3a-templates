@@ -91,8 +91,7 @@ const Home: Component = () => {
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = await sessionManagerInstance.authorizeSession();
         console.log({ data });
-        tKey = JSON.parse(data) as TKey;
-        console.log({ tKey });
+        tKey = data;
 
         const userDetails = await (
           tKey.serviceProvider as TorusServiceProvider
