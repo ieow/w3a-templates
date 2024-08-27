@@ -109,15 +109,17 @@ const Home: Component = () => {
         console.log({ loginDetails });
 
         const loginArgs = loginDetails.args as AggregateLoginParams;
+        const subInfos = loginArgs.subVerifierDetailsArray.map((s) => ({
+          idToken: s.clientId,
+          verifier: s.verifier,
+        }));
+        console.log({ aggregateVerifierIdentifier, subInfos });
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.getAggregateTorusKey(
-          loginArgs.verifierIdentifier,
+          aggregateVerifierIdentifier,
           "email",
-          loginArgs.subVerifierDetailsArray.map((s) => ({
-            idToken: s.clientId,
-            verifier: s.verifier,
-          })),
+          subInfos,
         );
 
         console.log("torus key: ", { res });
