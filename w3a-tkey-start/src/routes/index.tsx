@@ -1119,7 +1119,7 @@ const Home: Component = () => {
       </h1>
 
       <div class="grid">
-        <Show when={provider()}>
+        <Show when={loginRes()}>
           <>
             <div class="flex-container">
               <div>
