@@ -26,6 +26,7 @@ import { BN } from "bn.js";
 // import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
 import { SessionManager } from "@toruslabs/session-manager/dist/sessionManager.esm";
 import { getED25519Key } from "@toruslabs/openlogin-ed25519/dist/openloginEd25519.esm";
+import { revokeDiscordToken } from "./revoke";
 
 // import SolanaRpc from "./rpc";
 
@@ -142,22 +143,22 @@ const Home: Component = () => {
           // );
 
           // console.log("cleared login details of scope!");
-          // if (!("hashParameters" in result) || !result.hashParameters) {
-          //   console.log("no hashParameters in result, cannot revoke token!");
-          //   return;
-          // }
-          //
-          // if (!("access_token" in result.hashParameters)) {
-          //   console.log(
-          //     "no access token in hash parameters, cannot revoke token!",
-          //   );
-          //   return;
-          // }
+          if (!("hashParameters" in result) || !result.hashParameters) {
+            console.log("no hashParameters in result, cannot revoke token!");
+            return;
+          }
 
-          // const revokeRes = await revokeDiscordToken(
-          //   result.hashParameters.access_token,
-          // ).then((r) => r.json());
-          // console.log("revoke res: ", { revokeRes });
+          if (!("access_token" in result.hashParameters)) {
+            console.log(
+              "no access token in hash parameters, cannot revoke token!",
+            );
+            return;
+          }
+
+          const revokeRes = await revokeDiscordToken(
+            result.hashParameters.access_token,
+          ).then((r) => r.json());
+          console.log("revoke res: ", { revokeRes });
 
           // result = await (
           //   tKey.serviceProvider as TorusServiceProvider
