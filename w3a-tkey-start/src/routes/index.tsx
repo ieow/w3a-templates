@@ -194,7 +194,7 @@ const Home: Component = () => {
         );
 
         const sessionManagerInstance = new SessionManager({ sessionId });
-        const data = tKey.toJSON(); // any json data you want to store in the session
+        let data = tKey.toJSON(); // any json data you want to store in the session
         await sessionManagerInstance.createSession(data);
         console.log({ session_data: data });
         localStorage.setItem("session_id", sessionId);
@@ -202,6 +202,7 @@ const Home: Component = () => {
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
 
+        data = tKey.toJSON(); // any json data you want to store in the session
         console.log("tKey.initialize: ", { session_data: data });
         localStorage.setItem("session_id", sessionId);
 
@@ -215,6 +216,7 @@ const Home: Component = () => {
           );
         } else {
           await reconstructKey();
+          data = tKey.toJSON(); // any json data you want to store in the session
           console.log("reconstructKey: ", { session_data: data });
           localStorage.setItem("session_id", sessionId);
         }
