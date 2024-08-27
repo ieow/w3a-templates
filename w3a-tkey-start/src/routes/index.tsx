@@ -108,11 +108,21 @@ const Home: Component = () => {
         ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
         console.log({ loginDetails });
 
+        const loginArgs = loginDetails.args as AggregateLoginParams;
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
-        ).triggerAggregateLogin(loginDetails.args as AggregateLoginParams);
+        ).customAuthInstance.getAggregateTorusKey(
+          loginArgs.verifierIdentifier,
+          "email",
+          loginArgs.subVerifierDetailsArray.map((s) => ({
+            idToken: s.clientId,
+            verifier: s.verifier,
+          })),
+        );
 
-        console.log("existing session user info: ", { res });
+        console.log("torus key: ", { res });
+
+        // console.log("existing session user info: ", { res });
       }
 
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
