@@ -82,9 +82,7 @@ const Home: Component = () => {
       const sessionId = localStorage.getItem("session_id");
       if (sessionId) {
         const sessionManagerInstance = new SessionManager({ sessionId });
-        const raw = await sessionManagerInstance.authorizeSession();
-        console.log({ raw });
-        const data = JSON.parse(raw as any);
+        const data = (await sessionManagerInstance.authorizeSession()) as any;
         const rawTkey = data.tKey!;
         const rawUserInfo = data.userInfo;
         console.log({ rawTkey, rawUserInfo });
@@ -180,9 +178,7 @@ const Home: Component = () => {
           await reconstructKey();
           const sessionManagerInstance = new SessionManager({ sessionId });
           const data = tKey.toJSON();
-          await sessionManagerInstance.createSession(
-            JSON.stringify({ tKey: data, userInfo }),
-          );
+          await sessionManagerInstance.createSession({ tKey: data, userInfo });
           console.log("reconstructKey: ", { session_data: data });
         }
 
