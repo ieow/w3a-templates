@@ -14,10 +14,7 @@ import {
   TorusAggregateLoginResponse,
   TorusVerifierResponse,
 } from "@toruslabs/customauth";
-import {
-  getKeyCurve,
-  getPostboxKeyFrom1OutOf1,
-} from "@toruslabs/torus.js/dist/torusUtils.esm";
+import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
 import { BN } from "bn.js";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 // import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
@@ -174,9 +171,9 @@ const Home: Component = () => {
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
         const sessionData = { ...data, userInfo: res.userInfo[0] };
+        console.log({ session_data: sessionData });
         await sessionManagerInstance.createSession(sessionData);
         await tKey.syncLocalMetadataTransitions();
-        console.log("reconstructKey: ", { session_data: sessionData });
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
