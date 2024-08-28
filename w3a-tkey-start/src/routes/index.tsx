@@ -79,14 +79,13 @@ const Home: Component = () => {
   onMount(async () => {
     try {
       const sessionId = localStorage.getItem("session_id");
+
       if (sessionId) {
         const sessionManagerInstance = new SessionManager({ sessionId });
-        const data = (await sessionManagerInstance.authorizeSession()) as any;
-        const rawTkey = data.tKey!;
-        const rawUserInfo = data.userInfo;
-        console.log({ rawTkey, rawUserInfo });
-        console.log({ data });
-        tKey = await TKey.fromJSON(rawTkey, {
+        const raw = (await sessionManagerInstance.authorizeSession()) as any;
+        const { userInfo, ...data } = raw;
+        console.log({ data, userInfo });
+        tKey = await TKey.fromJSON(data, {
           enableLogging: true,
           modules: {
             webStorage: webStorageModule,
@@ -95,14 +94,7 @@ const Home: Component = () => {
           serviceProvider,
           storageLayer,
         });
-      }
 
-      await (tKey.serviceProvider as TorusServiceProvider).init({
-        skipSw: true,
-        skipPrefetch: true,
-      });
-
-      if (sessionId) {
         const loginDetails = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
@@ -114,20 +106,26 @@ const Home: Component = () => {
           verifier: s.verifier,
         }));
 
-        await reconstructKey();
         console.log({ aggregateVerifierIdentifier, subInfos });
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.getAggregateTorusKey(
           aggregateVerifierIdentifier,
-          "email",
+          userInfo.email,
           subInfos,
         );
 
         console.log("torus key: ", { res });
 
+        await reconstructKey();
+
         // console.log("existing session user info: ", { res });
       }
+
+      await (tKey.serviceProvider as TorusServiceProvider).init({
+        skipSw: true,
+        skipPrefetch: true,
+      });
 
       // Init is required for Redirect Flow but skip fetching sw.js and redirect.html )
       if (
