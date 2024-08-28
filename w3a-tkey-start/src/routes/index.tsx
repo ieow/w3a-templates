@@ -165,6 +165,14 @@ const Home: Component = () => {
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
 
+        const sessionManagerInstance = new SessionManager({ sessionId });
+        const data = tKey.toJSON();
+        await sessionManagerInstance.createSession({
+          ...data,
+          userInfo: res.userInfo[0],
+        });
+        console.log("reconstructKey: ", { session_data: data });
+
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
 
@@ -175,13 +183,6 @@ const Home: Component = () => {
           );
         } else {
           await reconstructKey();
-          const sessionManagerInstance = new SessionManager({ sessionId });
-          const data = tKey.toJSON();
-          await sessionManagerInstance.createSession({
-            ...data,
-            userInfo: res.userInfo[0],
-          });
-          console.log("reconstructKey: ", { session_data: data });
         }
 
         batch(() => {
