@@ -14,7 +14,10 @@ import {
   TorusAggregateLoginResponse,
   TorusVerifierResponse,
 } from "@toruslabs/customauth";
-import { getKeyCurve, getPostboxKeyFrom1OutOf1 } from "@toruslabs/torus.js";
+import {
+  getKeyCurve,
+  getPostboxKeyFrom1OutOf1,
+} from "@toruslabs/torus.js/dist/torusUtils.esm";
 import { BN } from "bn.js";
 import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 // import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
@@ -145,52 +148,6 @@ const Home: Component = () => {
           replaceUrl: true,
         });
 
-        console.log({ result });
-
-        if ("error" in result) {
-          console.log("error found from initial getRedirectResult: ", {
-            error: result.error,
-          });
-
-          const loginDetails = await (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.storageHelper.retrieveLoginDetails(
-            result.hashParameters?.scope ?? "local_scope",
-          );
-          console.log({ loginDetails });
-
-          // console.log("cleared login details of scope!");
-          if (!("hashParameters" in result) || !result.hashParameters) {
-            console.log("no hashParameters in result, cannot revoke token!");
-            return;
-          }
-
-          if (!("access_token" in result.hashParameters)) {
-            console.log(
-              "no access token in hash parameters, cannot revoke token!",
-            );
-            return;
-          }
-
-          const revokeRes = await revokeDiscordToken(
-            result.hashParameters.access_token,
-          ).then((r) => r.json());
-          console.log("revoke res: ", { revokeRes });
-
-          // result = await (
-          //   tKey.serviceProvider as TorusServiceProvider
-          // ).customAuthInstance.storageHelper.storeLoginDetails
-
-          result = await (
-            tKey.serviceProvider as TorusServiceProvider
-          ).customAuthInstance.getRedirectResult({
-            clearLoginDetails: true,
-            replaceUrl: true,
-          });
-        }
-
-        console.log({ new_result: result });
-
         const res = result.result as TorusAggregateLoginResponse;
         const sessionId = SessionManager.generateRandomSessionKey();
         localStorage.setItem("session_id", sessionId);
@@ -251,6 +208,7 @@ const Home: Component = () => {
   const reconstructKey = async () => {
     try {
       const reconstructedKey = await tKey.reconstructKey();
+      await tKey.syncLocalMetadataTransitions();
       console.log({ reconstructedKey });
       const seed = reconstructedKey.ed25519Seed;
       if (!seed) {
