@@ -167,11 +167,10 @@ const Home: Component = () => {
 
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
-        await sessionManagerInstance.createSession({
-          ...data,
-          userInfo: res.userInfo[0],
-        });
-        console.log("reconstructKey: ", { session_data: data });
+        const sessionData = { ...data, userInfo: res.userInfo[0] };
+        await sessionManagerInstance.createSession(sessionData);
+        await tKey.syncLocalMetadataTransitions();
+        console.log("reconstructKey: ", { session_data: sessionData });
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
@@ -206,7 +205,6 @@ const Home: Component = () => {
   const reconstructKey = async () => {
     try {
       const reconstructedKey = await tKey.reconstructKey();
-      await tKey.syncLocalMetadataTransitions();
       console.log({ reconstructedKey });
       const seed = reconstructedKey.ed25519Seed;
       if (!seed) {
