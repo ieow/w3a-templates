@@ -95,6 +95,11 @@ const Home: Component = () => {
           storageLayer,
         });
 
+        await (tKey.serviceProvider as TorusServiceProvider).init({
+          skipSw: true,
+          skipPrefetch: true,
+        });
+
         const loginDetails = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
