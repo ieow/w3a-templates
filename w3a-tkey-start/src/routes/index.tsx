@@ -114,14 +114,17 @@ const Home: Component = () => {
         console.log({ aggregateVerifierIdentifier, subInfos });
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
-        ).customAuthInstance.getAggregateTorusKey(
-          aggregateVerifierIdentifier,
-          userInfo.email,
-          subInfos,
-        );
+        ).customAuthInstance
+          .getAggregateTorusKey(
+            aggregateVerifierIdentifier,
+            userInfo.email,
+            subInfos,
+          )
+          .catch((e) => {
+            console.error("getAggregateTorusKey error: ", { e });
+          });
 
         console.log("torus key: ", { res });
-
         await reconstructKey();
 
         // console.log("existing session user info: ", { res });
