@@ -23,7 +23,6 @@ import { TorusStorageLayer } from "@tkey/storage-layer-torus";
 // import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider/dist/solanaProvider.esm";
 import { SessionManager } from "@toruslabs/session-manager";
 import { getED25519Key } from "@toruslabs/openlogin-ed25519";
-import { revokeDiscordToken } from "./revoke";
 import { AggregateLoginParams } from "@toruslabs/customauth";
 
 // import SolanaRpc from "./rpc";
@@ -178,7 +177,10 @@ const Home: Component = () => {
           await reconstructKey();
           const sessionManagerInstance = new SessionManager({ sessionId });
           const data = tKey.toJSON();
-          await sessionManagerInstance.createSession({ tKey: data, userInfo });
+          await sessionManagerInstance.createSession({
+            tKey: data,
+            userInfo: res.userInfo[0],
+          });
           console.log("reconstructKey: ", { session_data: data });
         }
 
