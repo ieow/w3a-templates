@@ -81,14 +81,23 @@ const Home: Component = () => {
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = await sessionManagerInstance.authorizeSession();
         console.log({ data });
-        tKey = data;
-        const newServiceProvider = new TorusServiceProvider({
-          enableLogging: tKey.serviceProvider.enableLogging,
-          postboxKey: tKey.serviceProvider.postboxKey.toString("hex"),
-          customAuthArgs: (tKey.serviceProvider as TorusServiceProvider)
-            .customAuthArgs,
+        tKey = await TKey.fromJSON(data!, {
+          enableLogging: true,
+          modules: {
+            webStorage: webStorageModule,
+          },
+          manualSync: true,
+          serviceProvider,
+          storageLayer,
         });
-        tKey.serviceProvider = newServiceProvider;
+
+        // const newServiceProvider = new TorusServiceProvider({
+        //   enableLogging: tKey.serviceProvider.enableLogging,
+        //   postboxKey: tKey.serviceProvider.postboxKey.toString("hex"),
+        //   customAuthArgs: (tKey.serviceProvider as TorusServiceProvider)
+        //     .customAuthArgs,
+        // });
+        // tKey.serviceProvider = newServiceProvider;
       }
 
       await (tKey.serviceProvider as TorusServiceProvider).init({
@@ -194,6 +203,7 @@ const Home: Component = () => {
           ),
           "hex",
         );
+
         (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.storeLoginDetails(
