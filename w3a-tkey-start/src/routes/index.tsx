@@ -178,7 +178,7 @@ const Home: Component = () => {
           const sessionManagerInstance = new SessionManager({ sessionId });
           const data = tKey.toJSON();
           await sessionManagerInstance.createSession({
-            tKey: data,
+            ...data,
             userInfo: res.userInfo[0],
           });
           console.log("reconstructKey: ", { session_data: data });
