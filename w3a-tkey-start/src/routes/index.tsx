@@ -82,9 +82,14 @@ const Home: Component = () => {
       const sessionId = localStorage.getItem("session_id");
       if (sessionId) {
         const sessionManagerInstance = new SessionManager({ sessionId });
-        const data = await sessionManagerInstance.authorizeSession();
+        const raw = await sessionManagerInstance.authorizeSession();
+        console.log({ raw });
+        const data = JSON.parse(raw as any);
+        const rawTkey = data.tKey!;
+        const rawUserInfo = data.userInfo;
+        console.log({ rawTkey, rawUserInfo });
         console.log({ data });
-        tKey = await TKey.fromJSON(data!, {
+        tKey = await TKey.fromJSON(rawTkey, {
           enableLogging: true,
           modules: {
             webStorage: webStorageModule,
@@ -93,14 +98,6 @@ const Home: Component = () => {
           serviceProvider,
           storageLayer,
         });
-
-        // const newServiceProvider = new TorusServiceProvider({
-        //   enableLogging: tKey.serviceProvider.enableLogging,
-        //   postboxKey: tKey.serviceProvider.postboxKey.toString("hex"),
-        //   customAuthArgs: (tKey.serviceProvider as TorusServiceProvider)
-        //     .customAuthArgs,
-        // });
-        // tKey.serviceProvider = newServiceProvider;
       }
 
       await (tKey.serviceProvider as TorusServiceProvider).init({
@@ -183,7 +180,9 @@ const Home: Component = () => {
           await reconstructKey();
           const sessionManagerInstance = new SessionManager({ sessionId });
           const data = tKey.toJSON();
-          await sessionManagerInstance.createSession(data);
+          await sessionManagerInstance.createSession(
+            JSON.stringify({ tKey: data, userInfo }),
+          );
           console.log("reconstructKey: ", { session_data: data });
         }
 
