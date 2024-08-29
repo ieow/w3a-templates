@@ -167,6 +167,9 @@ const Home: Component = () => {
 
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
+        await (
+          tKey.modules.webStorage as WebStorageModule
+        ).inputShareFromWebStorage();
 
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
