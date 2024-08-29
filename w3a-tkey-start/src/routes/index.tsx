@@ -97,6 +97,10 @@ const Home: Component = () => {
           skipPrefetch: true,
         });
 
+        await (
+          tKey.modules.webStorage as WebStorageModule
+        ).inputShareFromWebStorage();
+
         const loginDetails = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
@@ -167,9 +171,6 @@ const Home: Component = () => {
 
         // Initialization of tKey
         await tKey.initialize(); // 1/2 flow
-        await (
-          tKey.modules.webStorage as WebStorageModule
-        ).inputShareFromWebStorage();
 
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
