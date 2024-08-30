@@ -97,10 +97,6 @@ const Home: Component = () => {
           skipPrefetch: true,
         });
 
-        await (
-          tKey.modules.webStorage as WebStorageModule
-        ).inputShareFromWebStorage();
-
         const loginDetails = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance.storageHelper.retrieveLoginDetails(sessionId);
@@ -124,6 +120,10 @@ const Home: Component = () => {
           .catch((e) => {
             console.error("getAggregateTorusKey error: ", { e });
           });
+
+        await (
+          tKey.modules.webStorage as WebStorageModule
+        ).inputShareFromWebStorage();
 
         console.log("torus key: ", { res });
         await reconstructKey();
