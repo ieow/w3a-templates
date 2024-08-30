@@ -109,6 +109,10 @@ const Home: Component = () => {
         }));
 
         console.log({ aggregateVerifierIdentifier, subInfos });
+
+        await (
+          tKey.modules.webStorage as WebStorageModule
+        ).inputShareFromWebStorage();
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance
@@ -120,10 +124,6 @@ const Home: Component = () => {
           .catch((e) => {
             console.error("getAggregateTorusKey error: ", { e });
           });
-
-        await (
-          tKey.modules.webStorage as WebStorageModule
-        ).inputShareFromWebStorage();
 
         console.log("torus key: ", { res });
         await reconstructKey();
