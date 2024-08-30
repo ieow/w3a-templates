@@ -171,11 +171,11 @@ const Home: Component = () => {
         );
 
         // Initialization of tKey
-        const result = await tKey.initialize(); // 1/2 flow
+        const result2 = await tKey.initialize(); // 1/2 flow
 
-        if (result.requiredShares > 0) {
-          await tKey.modules.webStorage.inputShareFromWebStorage();
-        } 
+        if (result2.requiredShares > 0) {
+          await (tKey.modules.webStorage as any).inputShareFromWebStorage();
+        }
         await tKey.reconstructKey();
 
         const sessionManagerInstance = new SessionManager({ sessionId });
