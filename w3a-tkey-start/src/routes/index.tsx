@@ -110,9 +110,10 @@ const Home: Component = () => {
 
         console.log({ aggregateVerifierIdentifier, subInfos });
 
-        await (
-          tKey.modules.webStorage as WebStorageModule
-        ).inputShareFromWebStorage();
+        // await (
+        //   tKey.modules.webStorage as WebStorageModule
+        // ).inputShareFromWebStorage();
+
         const res = await (
           tKey.serviceProvider as TorusServiceProvider
         ).customAuthInstance
@@ -170,7 +171,12 @@ const Home: Component = () => {
         );
 
         // Initialization of tKey
-        await tKey.initialize(); // 1/2 flow
+        const result = await tKey.initialize(); // 1/2 flow
+
+        if (result.requiredShares > 0) {
+          await tKey.modules.webStorage.inputShareFromWebStorage();
+        } 
+        await tKey.reconstructKey();
 
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
