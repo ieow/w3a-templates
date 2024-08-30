@@ -35,7 +35,8 @@ const storageLayer = new TorusStorageLayer({
 const auth0domainUrl = "https://dev-n82s5hbtzoxieejz.us.auth0.com";
 const auth0ClientId = "Di3KAujLiJzPM3a4rVOOdiLLMxA5qanl";
 const aggregateVerifierIdentifier = "w3a-universal-verifier";
-const redirect_uri = "https://w3a-tkey-start.pages.dev";
+// const redirect_uri = "https://w3a-tkey-start.pages.dev";
+const redirect_uri = "http://localhost:3000";
 const serviceProvider = new TorusServiceProvider({
   enableLogging: true,
   customAuthArgs: {
@@ -178,12 +179,16 @@ const Home: Component = () => {
         }
         await tKey.reconstructKey();
 
+        console.log({ tkeyresult2: result2 });
+        console.log({tKey})
+
+        await tKey.syncLocalMetadataTransitions();
+
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
         const sessionData = { ...data, userInfo: res.userInfo[0] };
         console.log({ session_data: sessionData });
         await sessionManagerInstance.createSession(sessionData);
-        await tKey.syncLocalMetadataTransitions();
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
