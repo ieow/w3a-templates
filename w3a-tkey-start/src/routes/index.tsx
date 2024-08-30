@@ -178,12 +178,13 @@ const Home: Component = () => {
         } 
         await tKey.reconstructKey();
 
+        await tKey.syncLocalMetadataTransitions();
+        
         const sessionManagerInstance = new SessionManager({ sessionId });
         const data = tKey.toJSON();
         const sessionData = { ...data, userInfo: res.userInfo[0] };
         console.log({ session_data: sessionData });
         await sessionManagerInstance.createSession(sessionData);
-        await tKey.syncLocalMetadataTransitions();
 
         const { requiredShares } = tKey.getKeyDetails();
         console.log({ requiredShares });
